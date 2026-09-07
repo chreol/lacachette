@@ -1,0 +1,48 @@
+{
+  "name": "lacachette",
+  "version": "1.0.0",
+  "description": "LA CACHETTE — Bar • Restaurant • Lounge Vintage Africain à Ékié, Yaoundé 🇨🇲. Site web moderne développé avec Next.js, TypeScript et Tailwind CSS, présentant l’expérience, le menu, la galerie, les événements et les réservations.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://localhost:26831/chreol/lacachette"
+  },
+  "keywords": [
+    "nextjs",
+    "typescript",
+    "tailwindcss",
+    "restaurant",
+    "bar",
+    "yaounde",
+    "cameroon",
+    "vintage",
+    "african-design",
+    "restaurant-website",
+    "lounge",
+    "seo"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "next": "^16.3.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.5.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.4",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}
