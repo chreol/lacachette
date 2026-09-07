@@ -1,5 +1,6 @@
 import { Globe, Share2, Music2, MessageCircle, Leaf } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -12,13 +13,22 @@ export default function Footer() {
 
           {/* Column 1: Brand & Socials */}
           <div className="space-y-6">
-            <div>
-              <h2 className="text-3xl font-[family-name:var(--font-playfair)] text-[#C59A4A] mb-2 tracking-wide">
-                LA CACHETTE
-              </h2>
-              <p className="text-[#E8D8B8]/80 text-sm font-medium tracking-widest uppercase">
-                Restaurant-Bar · Vintage Africain
-              </p>
+            <div className="flex items-center gap-4">
+              <Image
+                src="/images/logo.webp"
+                alt="LA CACHETTE"
+                width={60}
+                height={60}
+                className="rounded-full object-cover"
+              />
+              <div>
+                <h2 className="text-3xl font-[family-name:var(--font-playfair)] text-[#C59A4A] tracking-wide">
+                  LA CACHETTE
+                </h2>
+                <p className="text-[#E8D8B8]/80 text-sm font-medium tracking-widest uppercase">
+                  Restaurant-Bar · Vintage Africain
+                </p>
+              </div>
             </div>
             <p className="text-[#E8D8B8]/70 leading-relaxed max-w-sm">
               Une évasion intimiste au cœur de Yaoundé. L'élégance du vintage africain rencontre la gastronomie moderne.

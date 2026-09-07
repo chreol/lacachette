@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
 
 const navLinks = [
   { label: "Le Concept", href: "#concept" },
@@ -41,15 +42,25 @@ export default function Navbar() {
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-10 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-2 flex items-center justify-between">
           {/* Logo */}
-          <a href="#home" className="flex flex-col group">
-            <span className="text-2xl md:text-3xl font-bold tracking-wider font-[family-name:var(--font-playfair)] text-[#C59A4A] group-hover:text-[#B86B32] transition-colors duration-300">
-              LA CACHETTE
-            </span>
-            <span className="text-[10px] tracking-[0.3em] text-[#E8D8B8]/40 uppercase">
-              Ékié · Yaoundé
-            </span>
+          <a href="#home" className="flex items-center gap-3 group shrink-0">
+            <Image
+              src="/images/logo.webp"
+              alt="LA CACHETTE"
+              width={50}
+              height={50}
+              className="rounded-full object-cover transition-transform duration-300 group-hover:scale-105"
+              priority
+            />
+            <div className="flex flex-col">
+              <span className="text-xl md:text-2xl font-bold tracking-wider font-[family-name:var(--font-playfair)] text-[#C59A4A] group-hover:text-[#B86B32] transition-colors duration-300">
+                LA CACHETTE
+              </span>
+              <span className="text-[9px] tracking-[0.25em] text-[#E8D8B8]/40 uppercase">
+                Ékié · Yaoundé
+              </span>
+            </div>
           </a>
 
           {/* Desktop Nav */}
