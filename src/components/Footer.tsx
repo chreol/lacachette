@@ -31,7 +31,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-[#E8D8B8]/70 leading-relaxed max-w-sm">
-              Une évasion intimiste au cœur de Yaoundé. L'élégance du vintage africain rencontre la gastronomie moderne.
+              Une évasion intimiste au cœur de Yaoundé. L&apos;élégance du vintage africain rencontre la gastronomie moderne.
             </p>
             <div className="flex items-center space-x-4 pt-4">
               <Link href="#" className="w-10 h-10 rounded-full bg-[#171310] border border-[#4A2C20] flex items-center justify-center text-[#C59A4A] hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300">

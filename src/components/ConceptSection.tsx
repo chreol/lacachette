@@ -89,18 +89,18 @@ export default function ConceptSection() {
               variants={itemVariants}
               className="font-[family-name:var(--font-playfair)] text-4xl md:text-5xl text-[#E8D8B8] font-bold mb-8 leading-tight"
             >
-              Le Sanctuaire Caché d'Ékié
+              Le Sanctuaire Caché d&apos;Ékié
             </motion.h2>
             
             <motion.div variants={itemVariants} className="space-y-6 text-[#E8D8B8]/80 font-[family-name:var(--font-jakarta)] text-lg leading-relaxed mb-12">
               <p>
-                Niché discrètement au cœur du quartier d'Ékié, La Cachette est bien plus qu'un simple restaurant-bar. C'est un refuge intime conçu pour éveiller les sens et célébrer l'authenticité camerounaise.
+                Niché discrètement au cœur du quartier d&apos;Ékié, La Cachette est bien plus qu&apos;un simple restaurant-bar. C&apos;est un refuge intime conçu pour éveiller les sens et célébrer l&apos;authenticité camerounaise.
               </p>
               <p>
-                L'âme du lieu réside dans sa conception. Chaque élément célèbre l'artisanat local : des meubles sculptés dans des palettes recyclées, du bambou de nos forêts intégré à la décoration, et des murs en briques de terre cuite qui conservent la chaleur de notre accueil.
+                L&apos;âme du lieu réside dans sa conception. Chaque élément célèbre l&apos;artisanat local : des meubles sculptés dans des palettes recyclées, du bambou de nos forêts intégré à la décoration, et des murs en briques de terre cuite qui conservent la chaleur de notre accueil.
               </p>
               <p>
-                Baigné dans une lumière chaude et ambrée de 2700K, notre sanctuaire vous invite à la détente, au partage et à la découverte d'une gastronomie qui honore nos racines tout en explorant de nouveaux horizons.
+                Baigné dans une lumière chaude et ambrée de 2700K, notre sanctuaire vous invite à la détente, au partage et à la découverte d&apos;une gastronomie qui honore nos racines tout en explorant de nouveaux horizons.
               </p>
             </motion.div>
 

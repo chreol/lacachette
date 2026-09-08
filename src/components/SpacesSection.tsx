@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { DoorOpen, TreePalm, Wine, Crown, ChefHat, Sparkles, MapPin } from "lucide-react";
-import { spaces, Space } from "@/types/restaurant";
+import { spaces } from "@/types/restaurant";
 
 const getIcon = (name: string) => {
   switch (name) {
