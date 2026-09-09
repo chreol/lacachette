@@ -50,8 +50,9 @@ export default function Navbar() {
               alt="LA CACHETTE"
               width={50}
               height={50}
-              className="rounded-full object-cover transition-transform duration-300 group-hover:scale-105"
-              priority
+              loading="eager"   // ← force le chargement immédiat (pas de lazy loading)
+              priority          // ← indique que c'est une image critique pour le LCP
+              
             />
             <div className="flex flex-col">
               <span className="text-xl md:text-2xl font-bold tracking-wider font-[family-name:var(--font-playfair)] text-[#C59A4A] group-hover:text-[#B86B32] transition-colors duration-300">

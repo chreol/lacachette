@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum StaffRole {
+  ADMIN
+  STAFF
+}
+
+model StaffUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         StaffRole @default(STAFF)
+  createdAt    DateTime @default(now())
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  RESCHEDULED
+  OTHER
+}
+
+enum SpaceChoice {
+  terrasse
+  salle
+  vip
+  privatisation_vip
+}
+
+model Reservation {
+  id          String            @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  date        String
+  time        String
+  guests      Int
+  space       SpaceChoice
+  message     String?
+  status      ReservationStatus @default(PENDING)
+  statusNote  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}

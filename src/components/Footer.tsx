@@ -82,14 +82,22 @@ export default function Footer() {
               </p>
               <div className="flex items-center space-x-3 pt-2">
                 <MessageCircle className="w-5 h-5 text-[#C59A4A]" />
-                <span className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors cursor-pointer">
-                  +237 6XX XXX XXX (WhatsApp)
-                </span>
+                <a
+                  href="https://wa.me/237693547268"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors"
+                >
+                  +237 693 547 268 (WhatsApp)
+                </a>
               </div>
               <div className="flex items-center space-x-3">
-                <span className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors cursor-pointer">
-                  contact@lacachette-yd.com
-                </span>
+                <a
+                  href="mailto:restolacachette@chreolempire.com"
+                  className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors"
+                >
+                  restolacachette@chreolempire.com
+                </a>
               </div>
             </div>
           </div>

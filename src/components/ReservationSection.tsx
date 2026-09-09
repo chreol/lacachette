@@ -2,7 +2,7 @@
 
 import { useState, useRef, FormEvent } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { User, Phone, Calendar, Clock, Users, MapPin, MessageSquare, Send } from 'lucide-react';
+import { User, Phone, Mail, Calendar, Clock, Users, MapPin, MessageSquare, Send } from 'lucide-react';
 import Image from 'next/image';
 import { ReservationForm } from '@/types/restaurant';
 
@@ -10,6 +10,7 @@ export default function ReservationSection() {
   const [formState, setFormState] = useState<ReservationForm>({
     name: '',
     phone: '',
+    email: '',
     date: '',
     time: '',
     guests: 2,
@@ -17,24 +18,46 @@ export default function ReservationSection() {
     message: ''
   });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsSuccess(true);
-    setTimeout(() => setIsSuccess(false), 5000);
-    setFormState({
-      name: '',
-      phone: '',
-      date: '',
-      time: '',
-      guests: 2,
-      space: 'salle',
-      message: ''
-    });
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/reservations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formState),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error ?? "Une erreur est survenue, veuillez réessayer.");
+        return;
+      }
+      setIsSuccess(true);
+      setTimeout(() => setIsSuccess(false), 6000);
+      setFormState({
+        name: '',
+        phone: '',
+        email: '',
+        date: '',
+        time: '',
+        guests: 2,
+        space: 'salle',
+        message: ''
+      });
+    } catch {
+      setError("Impossible d'envoyer la demande. Vérifiez votre connexion.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   const inputClassName = "w-full bg-[#171310] border border-[#4A2C20] rounded-lg px-4 py-3 pl-11 text-[#E8D8B8] focus:border-[#C59A4A] focus:ring-1 focus:ring-[#C59A4A] transition-all duration-300 placeholder:text-[#E8D8B8]/30 outline-none";
   const iconClassName = "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#C59A4A]";
@@ -87,12 +110,26 @@ export default function ReservationSection() {
                     <input
                       type="tel"
                       required
-                      placeholder="+237 Téléphone"
+                      placeholder="+237 Téléphone (WhatsApp actif)"
                       value={formState.phone}
                       onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
                       className={inputClassName}
                     />
+                    <span className="block mt-1.5 text-xs text-[#E8D8B8]/40">
+                      Ce numéro doit être actif sur WhatsApp pour recevoir l&apos;état de votre commande.
+                    </span>
                   </div>
+                </div>
+
+                <div className="relative">
+                  <Mail className={iconClassName} />
+                  <input
+                    type="email"
+                    placeholder="Email (optionnel — pour recevoir les notifications)"
+                    value={formState.email}
+                    onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                    className={inputClassName}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -161,11 +198,18 @@ export default function ReservationSection() {
                   />
                 </div>
 
+                {error && (
+                  <p className="text-sm text-red-400 bg-red-950/30 border border-red-900/50 rounded-lg px-4 py-2">
+                    {error}
+                  </p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full bg-[#C59A4A] text-[#171310] font-bold text-lg hover:bg-[#B86B32] rounded-lg py-4 transition-colors duration-300 flex items-center justify-center"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#C59A4A] text-[#171310] font-bold text-lg hover:bg-[#B86B32] rounded-lg py-4 transition-colors duration-300 flex items-center justify-center disabled:opacity-50"
                 >
-                  Réserver une table
+                  {isSubmitting ? "Envoi en cours..." : "Réserver une table"}
                 </button>
               </form>
             )}

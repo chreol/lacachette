@@ -56,7 +56,8 @@ export type SpaceChoice =
 
 export interface ReservationForm {
   name: string;
-  phone: string; // +237 xxx xxx xxx
+  phone: string; // +237 xxx xxx xxx — doit être un numéro WhatsApp actif
+  email?: string;
   date: string;
   time: string;
   guests: number;
