@@ -17,6 +17,29 @@ export const reservationInputSchema = z.object({
   guests: z.coerce.number().int().min(1).max(50),
   space: z.enum(spaceChoiceValues),
   message: z.string().trim().max(1000).optional(),
+}).superRefine((data, ctx) => {
+  // Validate that the date is not in the past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const inputDate = new Date(data.date);
+  if (inputDate < today) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "La date ne peut pas être dans le passé",
+      path: ["date"],
+    });
+  }
+
+  // Validate that the time matches HH:MM format
+  if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(data.time)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Format d'heure invalide (HH:MM attendu)",
+      path: ["time"],
+    });
+  }
+
+  // Note: slot availability is checked at the API level (not in Zod)
 });
 
 export type ReservationInput = z.infer<typeof reservationInputSchema>;

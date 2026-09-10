@@ -3,9 +3,12 @@ import { ReservationStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { reservationInputSchema, reservationStatusValues } from "@/lib/validation";
-import { toPrismaSpaceChoice, fromPrismaSpaceChoice, spaceLabels } from "@/lib/reservation-mapping";
-import { sendEmail, escapeHtml } from "@/lib/email";
+import { toPrismaSpaceChoice, fromPrismaSpaceChoice, spaceLabels, statusLabels } from "@/lib/reservation-mapping";
+import { sendEmail } from "@/lib/email";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { isSlotAvailable } from "@/lib/availability";
+import { buildNewReservationStaffEmail, buildReservationConfirmationClientEmail } from "@/lib/email-templates";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -25,6 +28,15 @@ export async function POST(request: NextRequest) {
 
   const data = parsed.data;
 
+  // 1. Check availability
+  const available = await isSlotAvailable(data.date, data.time, data.space, data.guests);
+  if (!available) {
+    return NextResponse.json(
+      { error: "Ce créneau n'est plus disponible pour le nombre de convives demandé." },
+      { status: 409 }
+    );
+  }
+
   const reservation = await prisma.reservation.create({
     data: {
       name: data.name,
@@ -38,32 +50,55 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  const whatsappMsg = `Bonjour ${data.name}, votre réservation à La Cachette du ${data.date} à ${data.time} a bien été enregistrée. Notre équipe vous contactera très prochainement. À bientôt !`;
+  const whatsappLink = buildWhatsAppLink(data.phone, whatsappMsg);
+
   const notifyTo = process.env.RESERVATION_NOTIFICATION_EMAIL;
   if (notifyTo) {
+    const staffEmailHtml = buildNewReservationStaffEmail({
+      name: data.name,
+      phone: data.phone,
+      email: data.email,
+      date: data.date,
+      time: data.time,
+      guests: data.guests,
+      space: spaceLabels[data.space] ?? data.space,
+      message: data.message,
+      whatsappLink,
+      adminUrl: 'https://restolacachette.chreolempire.com/admin',
+    });
+
     await sendEmail({
       to: [{ email: notifyTo }],
-      subject: `Nouvelle réservation — ${escapeHtml(data.name)} (${data.date} ${data.time})`,
-      html: `
-        <h2>Nouvelle demande de réservation</h2>
-        <ul>
-          <li><strong>Nom :</strong> ${escapeHtml(data.name)}</li>
-          <li><strong>Téléphone (WhatsApp) :</strong> ${escapeHtml(data.phone)}</li>
-          <li><strong>Email :</strong> ${data.email ? escapeHtml(data.email) : "—"}</li>
-          <li><strong>Date :</strong> ${escapeHtml(data.date)} à ${escapeHtml(data.time)}</li>
-          <li><strong>Convives :</strong> ${data.guests}</li>
-          <li><strong>Espace :</strong> ${escapeHtml(spaceLabels[data.space] ?? data.space)}</li>
-          ${data.message ? `<li><strong>Message :</strong> ${escapeHtml(data.message)}</li>` : ""}
-        </ul>
-        <p>Gérez cette réservation dans la page admin.</p>
-      `,
+      subject: `Nouvelle réservation — ${data.name} (${data.date} ${data.time})`,
+      html: staffEmailHtml,
     }).catch((err) => console.error("[reservations] notification email échouée", err));
+  }
+
+  if (data.email) {
+    const clientEmailHtml = buildReservationConfirmationClientEmail({
+      name: data.name,
+      date: data.date,
+      time: data.time,
+      guests: data.guests,
+      space: spaceLabels[data.space] ?? data.space,
+      message: data.message,
+      status: statusLabels['PENDING'],
+    });
+
+    await sendEmail({
+      to: [{ email: data.email, name: data.name }],
+      subject: `Confirmation de votre demande de réservation — La Cachette`,
+      html: clientEmailHtml,
+    }).catch((err) => console.error("[reservations] email client échoué", err));
   }
 
   await sendTelegramMessage(
     `🍽️ Nouvelle réservation — ${data.name}\n` +
       `📞 ${data.phone}${data.email ? ` · ${data.email}` : ""}\n` +
       `📅 ${data.date} à ${data.time} · ${data.guests} pers. · ${spaceLabels[data.space] ?? data.space}` +
-      (data.message ? `\n💬 ${data.message}` : "")
+      (data.message ? `\n💬 ${data.message}` : "") +
+      `\n📲 WhatsApp: ${whatsappLink}`
   ).catch((err) => console.error("[reservations] notification telegram échouée", err));
 
   return NextResponse.json({ id: reservation.id }, { status: 201 });

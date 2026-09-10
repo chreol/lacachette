@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { updateReservationSchema } from "@/lib/validation";
-import { fromPrismaSpaceChoice, statusLabels } from "@/lib/reservation-mapping";
-import { sendEmail, escapeHtml } from "@/lib/email";
+import { fromPrismaSpaceChoice, statusLabels, spaceLabels } from "@/lib/reservation-mapping";
+import { sendEmail } from "@/lib/email";
 import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { buildStatusUpdateClientEmail } from "@/lib/email-templates";
+import { sendTelegramMessage } from "@/lib/telegram";
 
 export async function PATCH(
   request: NextRequest,
@@ -58,17 +60,32 @@ export async function PATCH(
   }
 
   if (existing.email) {
+    const emailHtml = buildStatusUpdateClientEmail({
+      name: existing.name,
+      date: updated.date,
+      time: updated.time,
+      guests: existing.guests,
+      space: spaceLabels[fromPrismaSpaceChoice(existing.space)] ?? fromPrismaSpaceChoice(existing.space),
+      status: statusLabel,
+      statusKey: status,
+      statusNote,
+    });
+
     await sendEmail({
       to: [{ email: existing.email, name: existing.name }],
       subject: `Votre réservation La Cachette — ${statusLabel}`,
-      html: `
-        <p>Bonjour ${escapeHtml(existing.name)},</p>
-        <p>Le statut de votre réservation du ${escapeHtml(updated.date)} à ${escapeHtml(updated.time)} est désormais : <strong>${escapeHtml(statusLabel)}</strong>.</p>
-        ${statusNote ? `<p>${escapeHtml(statusNote)}</p>` : ""}
-        <p>À très bientôt,<br/>L'équipe La Cachette</p>
-      `,
+      html: emailHtml,
     }).catch((err) => console.error("[reservations] email statut échoué", err));
   }
+
+  const previousStatusLabel = statusLabels[existing.status] ?? existing.status;
+  await sendTelegramMessage(
+    `🔔 Statut mis à jour — ${existing.name}\n` +
+      `📋 ${previousStatusLabel} → ${statusLabel}\n` +
+      `📅 ${updated.date} à ${updated.time} · ${existing.guests} pers.\n` +
+      (statusNote ? `📝 ${statusNote}\n` : "") +
+      `📲 WhatsApp: ${whatsappLink}`
+  ).catch((err) => console.error("[reservations] notification telegram échouée", err));
 
   return NextResponse.json({
     reservation: { ...updated, space: fromPrismaSpaceChoice(updated.space) },

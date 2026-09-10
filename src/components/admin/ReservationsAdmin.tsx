@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { MessageCircle, RefreshCw } from "lucide-react";
+import Image from "next/image";
+import { RefreshCw } from "lucide-react";
 import { statusLabels, spaceLabels } from "@/lib/reservation-mapping";
 import { reservationStatusValues } from "@/lib/validation";
 
@@ -26,6 +27,13 @@ const statusColors: Record<string, string> = {
   CANCELLED: "bg-red-500/20 text-red-300 border-red-500/40",
   RESCHEDULED: "bg-blue-500/20 text-blue-300 border-blue-500/40",
   OTHER: "bg-gray-500/20 text-gray-300 border-gray-500/40",
+};
+
+const spaceColors: Record<string, string> = {
+  terrasse: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+  salle: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+  vip: "bg-purple-500/20 text-purple-300 border-purple-500/40",
+  "privatisation-vip": "bg-pink-500/20 text-pink-300 border-pink-500/40",
 };
 
 export default function ReservationsAdmin() {
@@ -142,6 +150,11 @@ export default function ReservationsAdmin() {
                   >
                     {statusLabels[r.status]}
                   </span>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full border ${spaceColors[r.space] ?? "bg-gray-500/20 text-gray-300 border-gray-500/40"}`}
+                  >
+                    {spaceLabels[r.space] ?? r.space}
+                  </span>
                 </div>
                 <p className="text-sm text-[#E8D8B8]/70">
                   {r.date} à {r.time} · {r.guests} pers. · {spaceLabels[r.space] ?? r.space}
@@ -158,7 +171,12 @@ export default function ReservationsAdmin() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-sm text-[#25D366] hover:underline mt-1"
                   >
-                    <MessageCircle className="w-4 h-4" /> Contacter sur WhatsApp
+                    <Image
+                      src="/images/whatsapp-official.webp"
+                      alt="WhatsApp"
+                      width={16}
+                      height={16}
+                    /> Contacter sur WhatsApp
                   </a>
                 )}
               </div>
@@ -182,6 +200,22 @@ export default function ReservationsAdmin() {
                       {statusLabels[s]}
                     </button>
                   ))}
+                  {whatsappLinks[r.id] && (
+                    <a
+                      href={whatsappLinks[r.id]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors font-medium"
+                    >
+                      <Image
+                        src="/images/whatsapp-official.webp"
+                        alt="WhatsApp"
+                        width={14}
+                        height={14}
+                      />
+                      WhatsApp
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
