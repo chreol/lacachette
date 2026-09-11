@@ -61,10 +61,12 @@ export default function ReservationSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Clé de rafraîchissement : s'incrémente après chaque réservation pour forcer le re-fetch des créneaux
+  const [slotRefreshKey, setSlotRefreshKey] = useState(0);
 
   const dates = useRef(generateNext14Days()).current;
 
-  // Fetch availability when date or space changes
+  // Fetch availability when date, space or slotRefreshKey changes
   useEffect(() => {
     if (!formState.date || !formState.space) {
       setSlots([]);
@@ -91,7 +93,7 @@ export default function ReservationSection() {
 
     fetchSlots();
     return () => { cancelled = true; };
-  }, [formState.date, formState.space]);
+  }, [formState.date, formState.space, slotRefreshKey]);
 
   const handleDateSelect = (dateValue: string) => {
     setFormState(prev => ({ ...prev, date: dateValue, time: '' }));
@@ -124,6 +126,8 @@ export default function ReservationSection() {
       }
 
       setIsSuccess(true);
+      // Force le re-fetch des créneaux pour refléter la nouvelle réservation
+      setSlotRefreshKey(prev => prev + 1);
     } catch {
       setError("Impossible d'envoyer la demande. Vérifiez votre connexion.");
     } finally {
@@ -132,6 +136,7 @@ export default function ReservationSection() {
   };
 
   const isFormComplete = formState.name && formState.phone && formState.guests && formState.space && formState.date && formState.time;
+
 
   return (
     <section id="reservation" className="py-24 bg-[#171310] text-[#E8D8B8] font-[family-name:var(--font-jakarta)] overflow-hidden">

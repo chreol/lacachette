@@ -102,7 +102,7 @@ export async function PATCH(
     statusNote ? `📝 <b>Note :</b> <i>${statusNote}</i>` : null,
     `━━━━━━━━━━━━━━━━━━━━`,
     whatsappLink ? `📲 <a href="${whatsappLink}">Contacter le client sur WhatsApp</a>` : null,
-    `🔧 <a href="https://restolacachette.chreolempire.com/admin">Gérer dans l'Admin</a>`,
+    `🔧 <a href="${process.env.ADMIN_URL ?? 'https://lacachette-nu.vercel.app/admin'}">Gérer dans l'Admin</a>`,
   ].filter(Boolean).join('\n');
 
   await sendTelegramMessage(statusTelegramMsg, 'HTML')

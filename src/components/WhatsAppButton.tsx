@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { X, Send } from "lucide-react";
 import { buildRestaurantWhatsAppLink } from "@/lib/whatsapp";
@@ -11,6 +11,10 @@ const DEFAULT_MESSAGE =
 export default function WhatsAppButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
+  // Avoid SSR/client hydration mismatch — render nothing server-side
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
 
   const handleSend = () => {
     const link = buildRestaurantWhatsAppLink(message);

@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       space: spaceLabels[data.space] ?? data.space,
       message: data.message,
       whatsappLink,
-      adminUrl: 'https://restolacachette.chreolempire.com/admin',
+      adminUrl: process.env.ADMIN_URL ?? 'https://lacachette-nu.vercel.app/admin',
     });
 
     await sendEmail({
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
     data.message ? `💬 <b>Message :</b> <i>${data.message}</i>` : null,
     data.message ? `━━━━━━━━━━━━━━━━━━━━` : null,
     `📲 <a href="${whatsappLink}">Contacter sur WhatsApp</a>`,
-    `🔧 <a href="https://restolacachette.chreolempire.com/admin">Gérer dans l'Admin</a>`,
+    `🔧 <a href="${process.env.ADMIN_URL ?? 'https://lacachette-nu.vercel.app/admin'}">Gérer dans l'Admin</a>`,
     `🌐 <a href="https://resto.chreolempire.com">resto.chreolempire.com</a>`,
   ].filter(Boolean).join('\n');
 
