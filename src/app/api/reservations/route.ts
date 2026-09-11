@@ -93,13 +93,29 @@ export async function POST(request: NextRequest) {
     }).catch((err) => console.error("[reservations] email client échoué", err));
   }
 
-  await sendTelegramMessage(
-    `🍽️ Nouvelle réservation — ${data.name}\n` +
-      `📞 ${data.phone}${data.email ? ` · ${data.email}` : ""}\n` +
-      `📅 ${data.date} à ${data.time} · ${data.guests} pers. · ${spaceLabels[data.space] ?? data.space}` +
-      (data.message ? `\n💬 ${data.message}` : "") +
-      `\n📲 WhatsApp: ${whatsappLink}`
-  ).catch((err) => console.error("[reservations] notification telegram échouée", err));
+  const telegramMsg = [
+    `🍽️ <b>Nouvelle Réservation — La Cachette</b>`,
+    `━━━━━━━━━━━━━━━━━━━━`,
+    `👤 <b>Client :</b> ${data.name}`,
+    `📞 <b>Tél :</b> ${data.phone}`,
+    `📲 <b>WhatsApp :</b> <a href="https://wa.me/${data.phone.replace(/[^\d]/g, '')}">+${data.phone.replace(/[^\d]/g, '')}</a>`,
+    data.email ? `📧 <b>Email :</b> ${data.email}` : null,
+    `━━━━━━━━━━━━━━━━━━━━`,
+    `📅 <b>Date :</b> ${data.date}`,
+    `⏰ <b>Heure :</b> ${data.time}`,
+    `👥 <b>Convives :</b> ${data.guests}`,
+    `📍 <b>Espace :</b> ${spaceLabels[data.space] ?? data.space}`,
+    `━━━━━━━━━━━━━━━━━━━━`,
+    data.message ? `💬 <b>Message :</b> <i>${data.message}</i>` : null,
+    data.message ? `━━━━━━━━━━━━━━━━━━━━` : null,
+    `📲 <a href="${whatsappLink}">Contacter sur WhatsApp</a>`,
+    `🔧 <a href="https://restolacachette.chreolempire.com/admin">Gérer dans l'Admin</a>`,
+    `🌐 <a href="https://resto.chreolempire.com">resto.chreolempire.com</a>`,
+  ].filter(Boolean).join('\n');
+
+  await sendTelegramMessage(telegramMsg, 'HTML')
+    .catch((err) => console.error("[reservations] notification telegram échouée", err));
+
 
   return NextResponse.json({ id: reservation.id }, { status: 201 });
 }

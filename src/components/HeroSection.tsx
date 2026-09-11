@@ -36,7 +36,6 @@ export default function HeroSection() {
           fill
           priority
           className="object-cover object-center"
-          quality={90}
         />
         
         {/* Gradients */}

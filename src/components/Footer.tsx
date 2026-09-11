@@ -1,4 +1,4 @@
-import { Globe, Share2, Music2, MessageCircle, Leaf } from 'lucide-react';
+import { Globe, Share2, Music2, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -25,8 +25,8 @@ export default function Footer() {
                 <h2 className="text-3xl font-[family-name:var(--font-playfair)] text-[#C59A4A] tracking-wide">
                   LA CACHETTE
                 </h2>
-                <p className="text-[#E8D8B8]/80 text-sm font-medium tracking-widest uppercase">
-                  Restaurant-Bar · Vintage Africain
+                <p className="text-[#E8D8B8]/80 text-sm font-medium italic">
+                  L&apos;ambiance se cache ici.
                 </p>
               </div>
             </div>
@@ -61,7 +61,7 @@ export default function Footer() {
                 <span className="text-[#C59A4A]">17h - 02h</span>
               </li>
               <li className="flex justify-between max-w-xs">
-                <span className="flex-1">Dimanche <br/><span className="text-xs text-[#E8D8B8]/50">(Brunch & Chill)</span></span>
+                <span className="flex-1">Dimanche <br/><span className="text-xs text-[#E8D8B8]/50">(Brunch &amp; Chill)</span></span>
                 <span className="text-[#C59A4A]">12h - 22h</span>
               </li>
               <li className="flex justify-between max-w-xs pt-2">
@@ -74,34 +74,110 @@ export default function Footer() {
           {/* Column 3: Contact & Accès */}
           <div>
             <h3 className="text-xl font-[family-name:var(--font-playfair)] text-[#E8D8B8] mb-6 border-b border-[#4A2C20] pb-4 inline-block">
-              Contact & Accès
+              Contact &amp; Accès
             </h3>
-            <div className="space-y-4 text-[#E8D8B8]/80">
-              <p>
-                Ékié, Yaoundé, Cameroun
-              </p>
-              <div className="flex items-center space-x-3 pt-2">
-                <MessageCircle className="w-5 h-5 text-[#C59A4A]" />
+            <div className="space-y-3 text-[#E8D8B8]/80">
+              {/* Adresse */}
+              <div className="flex items-start gap-3">
+                <span className="text-[#C59A4A] mt-0.5 flex-shrink-0">📍</span>
+                <span className="text-sm">Sis à Ékié, Dernier Poteau – Yaoundé, Cameroun</span>
+              </div>
+
+              {/* Paiement */}
+              <div className="flex items-start gap-3">
+                <span className="text-[#C59A4A] mt-0.5 flex-shrink-0">🔐</span>
+                <span className="text-xs text-[#E8D8B8]/60">Mobile Money · Virement · PayPal · Crypto</span>
+              </div>
+
+              {/* Téléphone */}
+              <div className="flex items-center gap-3">
+                <span className="text-[#C59A4A] flex-shrink-0">📞</span>
+                <a href="tel:+237693547268" className="hover:text-[#C59A4A] transition-colors text-sm">
+                  (237) 693 547 268
+                </a>
+              </div>
+
+              {/* WhatsApp */}
+              <div className="flex items-center gap-2">
+                <Image
+                  src="/images/whatsapp-official.webp"
+                  alt="WhatsApp"
+                  width={18}
+                  height={18}
+                  className="flex-shrink-0"
+                />
                 <a
                   href="https://wa.me/237693547268"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors"
+                  className="text-[#E8D8B8] hover:text-[#25D366] transition-colors text-sm"
                 >
                   +237 693 547 268 (WhatsApp)
                 </a>
               </div>
-              <div className="flex items-center space-x-3">
+
+              {/* Telegram Bot */}
+              <div className="flex items-center gap-3">
+                <MessageCircle className="w-4 h-4 text-[#229ED9] flex-shrink-0" />
                 <a
-                  href="mailto:restolacachette@chreolempire.com"
-                  className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors"
+                  href="https://t.me/LacachetteResto_Bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#E8D8B8] hover:text-[#229ED9] transition-colors text-sm"
                 >
-                  restolacachette@chreolempire.com
+                  @LacachetteResto_Bot
                 </a>
+              </div>
+
+              {/* Website */}
+              <div className="flex items-center gap-3">
+                <span className="text-[#C59A4A] flex-shrink-0">🌐</span>
+                <a
+                  href="https://resto.chreolempire.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors text-sm"
+                >
+                  resto.chreolempire.com
+                </a>
+              </div>
+
+              {/* Emails */}
+              <div className="flex items-start gap-3 pt-1">
+                <span className="text-[#C59A4A] flex-shrink-0 mt-0.5">📧</span>
+                <div className="flex flex-col gap-1">
+                  <a href="mailto:restolacachatte@chreolempire.com" className="text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors">
+                    restolacachatte@chreolempire.com
+                  </a>
+                  <a href="mailto:lacachette@resto.chreolempire.com" className="text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors">
+                    lacachette@resto.chreolempire.com
+                  </a>
+                </div>
               </div>
             </div>
           </div>
 
+        </div>
+      </div>
+
+      {/* Chreol Empire Brand */}
+      <div className="border-t border-[#4A2C20]/30">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8 flex flex-col md:flex-row items-center justify-center gap-4">
+          <span className="text-[#E8D8B8]/30 text-xs uppercase tracking-widest">Une marque déposée de</span>
+          <a
+            href="https://chreolempire.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="opacity-50 hover:opacity-100 transition-opacity duration-300"
+          >
+            <Image
+              src="/images/chreol-empire.png"
+              alt="Chreol Empire"
+              width={110}
+              height={36}
+              className="object-contain"
+            />
+          </a>
         </div>
       </div>
 
@@ -111,10 +187,9 @@ export default function Footer() {
           <p className="text-[#E8D8B8]/60 text-sm">
             © 2026 La Cachette. Tous droits réservés. <span className="hidden md:inline">|</span> Fait avec ♥ à Yaoundé
           </p>
-          <div className="flex items-center space-x-2 text-[#596044] bg-[#596044]/10 px-4 py-2 rounded-full text-xs font-medium border border-[#596044]/20">
-            <Leaf className="w-4 h-4" />
-            <span>Éco-responsable · Matériaux locaux</span>
-          </div>
+          <p className="text-[#E8D8B8]/30 text-xs">
+            Powered by <a href="https://chreolempire.com" target="_blank" rel="noopener noreferrer" className="text-[#C59A4A]/50 hover:text-[#C59A4A] transition-colors">Chreol Empire</a>
+          </p>
         </div>
       </div>
     </footer>

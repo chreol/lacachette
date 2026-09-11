@@ -79,16 +79,38 @@ export async function PATCH(
   }
 
   const previousStatusLabel = statusLabels[existing.status] ?? existing.status;
-  await sendTelegramMessage(
-    `🔔 Statut mis à jour — ${existing.name}\n` +
-      `📋 ${previousStatusLabel} → ${statusLabel}\n` +
-      `📅 ${updated.date} à ${updated.time} · ${existing.guests} pers.\n` +
-      (statusNote ? `📝 ${statusNote}\n` : "") +
-      `📲 WhatsApp: ${whatsappLink}`
-  ).catch((err) => console.error("[reservations] notification telegram échouée", err));
+
+  const statusEmoji: Record<string, string> = {
+    CONFIRMED: '✅',
+    CANCELLED: '❌',
+    RESCHEDULED: '📅',
+    OTHER: '💳',
+    PENDING: '⏳',
+  };
+  const emoji = statusEmoji[status] ?? '🔔';
+
+  const statusTelegramMsg = [
+    `${emoji} <b>Statut mis à jour — La Cachette</b>`,
+    `━━━━━━━━━━━━━━━━━━━━`,
+    `👤 <b>Client :</b> ${existing.name}`,
+    `📞 <b>Tél :</b> ${existing.phone}`,
+    `📲 <b>WhatsApp :</b> <a href="https://wa.me/${existing.phone.replace(/[^\d]/g, '')}">+${existing.phone.replace(/[^\d]/g, '')}</a>`,
+    `━━━━━━━━━━━━━━━━━━━━`,
+    `📋 <b>Statut :</b> ${previousStatusLabel} → <b>${statusLabel}</b>`,
+    `📅 <b>Date :</b> ${updated.date} à ${updated.time}`,
+    `👥 <b>Convives :</b> ${existing.guests}`,
+    statusNote ? `📝 <b>Note :</b> <i>${statusNote}</i>` : null,
+    `━━━━━━━━━━━━━━━━━━━━`,
+    whatsappLink ? `📲 <a href="${whatsappLink}">Contacter le client sur WhatsApp</a>` : null,
+    `🔧 <a href="https://restolacachette.chreolempire.com/admin">Gérer dans l'Admin</a>`,
+  ].filter(Boolean).join('\n');
+
+  await sendTelegramMessage(statusTelegramMsg, 'HTML')
+    .catch((err) => console.error("[reservations] notification telegram échouée", err));
 
   return NextResponse.json({
     reservation: { ...updated, space: fromPrismaSpaceChoice(updated.space) },
     whatsappLink,
   });
 }
+

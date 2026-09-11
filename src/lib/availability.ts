@@ -66,6 +66,13 @@ export async function getAvailableSlots(date: string, space: string): Promise<Sl
     }
   });
 
+  // Determine if the requested date is today (to filter past time slots)
+  const todayStr = new Date().toISOString().split('T')[0];
+  const isToday = date === todayStr;
+  const nowMinutes = isToday
+    ? new Date().getHours() * 60 + new Date().getMinutes()
+    : -1;
+
   const slotsAvailability: SlotAvailability[] = [];
 
   // For 'privatisation-vip', any existing reservation makes ALL slots 'full'
@@ -73,6 +80,12 @@ export async function getAvailableSlots(date: string, space: string): Promise<Sl
 
   for (const slotTime of config.slots) {
     const slotMins = timeToMinutes(slotTime);
+
+    // Skip slots that have already passed today (need at least 30 min of notice)
+    if (isToday && slotMins <= nowMinutes) {
+      continue;
+    }
+
     let overlappingGuests = 0;
     let hasExclusive = false;
 

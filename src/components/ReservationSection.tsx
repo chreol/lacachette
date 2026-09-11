@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, FormEvent } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { User, Phone, Mail, Calendar, Clock, Users, MapPin, MessageSquare, Send, Loader2, Check } from 'lucide-react';
+import { User, Mail, Calendar, Clock, Users, MapPin, MessageSquare, Send, Loader2, Check, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { ReservationForm } from '@/types/restaurant';
 
@@ -177,8 +177,8 @@ export default function ReservationSection() {
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Row 1: Nom + Téléphone */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Row 1: Nom + Téléphone WhatsApp */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                   <div className="relative">
                     <User className={iconClassName} />
                     <input
@@ -190,18 +190,20 @@ export default function ReservationSection() {
                       className={inputClassName}
                     />
                   </div>
-                  <div className="relative">
-                    <Phone className={iconClassName} />
-                    <input
-                      type="tel"
-                      required
-                      placeholder="+237 Téléphone (WhatsApp actif)"
-                      value={formState.phone}
-                      onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
-                      className={inputClassName}
-                    />
-                    <span className="block mt-1.5 text-xs text-[#E8D8B8]/40">
-                      Ce numéro doit être actif sur WhatsApp pour recevoir l&apos;état de votre commande.
+                  <div className="flex flex-col gap-1.5">
+                    <div className="relative">
+                      <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#25D366]" />
+                      <input
+                        type="tel"
+                        required
+                        placeholder="WhatsApp actif (ex: +237 6XX XXX XXX)"
+                        value={formState.phone}
+                        onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                        className={inputClassName}
+                      />
+                    </div>
+                    <span className="text-xs text-[#E8D8B8]/40 pl-1">
+                      Ce numéro doit être actif sur WhatsApp — nous vous contacterons via ce canal.
                     </span>
                   </div>
                 </div>
