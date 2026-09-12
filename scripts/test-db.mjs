@@ -1,0 +1,1 @@
+﻿import { PrismaClient } from '@prisma/client'; const p = new PrismaClient(); p.reservation.count().then(n => { console.log("BDD OK:", n); return p["$disconnect"](); }).catch(e => { console.log("BDD ERROR:", e.message); return p["$disconnect"](); });
