@@ -65,6 +65,7 @@ export default function ReservationSection() {
   });
 
   const [slots, setSlots] = useState<SlotAvailability[]>([]);
+  const [slotsError, setSlotsError] = useState<string | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -78,22 +79,31 @@ export default function ReservationSection() {
   useEffect(() => {
     if (!formState.date || !formState.space) {
       setSlots([]);
+      setSlotsError(null);
       return;
     }
 
     let cancelled = false;
     const fetchSlots = async () => {
       setIsLoadingSlots(true);
+      setSlotsError(null);
       try {
         const res = await fetch(`/api/availability?date=${formState.date}&space=${formState.space}`);
-        if (res.ok && !cancelled) {
-          const data = await res.json();
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.ok) {
           setSlots(data.slots || []);
-        } else if (!cancelled) {
+        } else {
           setSlots([]);
+          setSlotsError(
+            "Impossible de charger les créneaux. Réessayez dans un instant.",
+          );
         }
       } catch {
-        if (!cancelled) setSlots([]);
+        if (!cancelled) {
+          setSlots([]);
+          setSlotsError("Impossible de charger les créneaux. Vérifiez votre connexion.");
+        }
       } finally {
         if (!cancelled) setIsLoadingSlots(false);
       }
@@ -345,6 +355,8 @@ export default function ReservationSection() {
                         <Loader2 className="w-5 h-5 animate-spin text-[#C59A4A]" />
                         <span className="text-sm">Recherche des disponibilités...</span>
                       </div>
+                    ) : slotsError ? (
+                      <p className="text-sm text-red-400 py-4 text-center">{slotsError}</p>
                     ) : slots.length > 0 ? (
                       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                         {slots.map((slot) => {

@@ -95,7 +95,7 @@ Crée un fichier `.env.local` à la racine :
 
 ```env
 # Base de données Supabase
-DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:6543/postgres?pgbouncer=true"
+DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
 DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
 
 # Sessions admin (générer : openssl rand -base64 32)
