@@ -14,12 +14,14 @@ enum StaffRole {
 }
 
 model StaffUser {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   passwordHash String
   name         String
   role         StaffRole @default(STAFF)
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
+  otpCode      String?
+  otpExpiresAt DateTime?
 }
 
 enum ReservationStatus {
