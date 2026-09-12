@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Search, Calendar, Clock, Users, MessageSquare, Phone, Mail, ChevronDown } from "lucide-react";
 import { statusLabels, spaceLabels } from "@/lib/reservation-mapping";
 import { reservationStatusValues } from "@/lib/validation";
 
@@ -21,28 +21,41 @@ interface Reservation {
   createdAt: string;
 }
 
-const statusColors: Record<string, string> = {
-  PENDING: "bg-yellow-500/20 text-yellow-300 border-yellow-500/40",
-  CONFIRMED: "bg-green-500/20 text-green-300 border-green-500/40",
-  CANCELLED: "bg-red-500/20 text-red-300 border-red-500/40",
-  RESCHEDULED: "bg-blue-500/20 text-blue-300 border-blue-500/40",
-  OTHER: "bg-gray-500/20 text-gray-300 border-gray-500/40",
+const statusConfig: Record<string, { color: string; bg: string; border: string; dot: string; emoji: string }> = {
+  PENDING:      { color: "text-amber-300",   bg: "bg-amber-500/10",   border: "border-amber-500/30",  dot: "bg-amber-400",   emoji: "⏳" },
+  CONFIRMED:    { color: "text-green-300",   bg: "bg-green-500/10",   border: "border-green-500/30",  dot: "bg-green-400",   emoji: "✅" },
+  CANCELLED:    { color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",    dot: "bg-red-400",     emoji: "❌" },
+  RESCHEDULED:  { color: "text-blue-300",    bg: "bg-blue-500/10",    border: "border-blue-500/30",   dot: "bg-blue-400",    emoji: "📅" },
+  OTHER:        { color: "text-purple-300",  bg: "bg-purple-500/10",  border: "border-purple-500/30", dot: "bg-purple-400",  emoji: "💳" },
 };
 
-const spaceColors: Record<string, string> = {
-  terrasse: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-  salle: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-  vip: "bg-purple-500/20 text-purple-300 border-purple-500/40",
-  "privatisation-vip": "bg-pink-500/20 text-pink-300 border-pink-500/40",
+const spaceConfig: Record<string, { color: string; bg: string; border: string }> = {
+  terrasse:           { color: "text-emerald-300", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
+  salle:              { color: "text-amber-300",   bg: "bg-amber-500/10",   border: "border-amber-500/30"   },
+  vip:                { color: "text-purple-300",  bg: "bg-purple-500/10",  border: "border-purple-500/30"  },
+  "privatisation-vip":{ color: "text-pink-300",    bg: "bg-pink-500/10",    border: "border-pink-500/30"    },
 };
+
+function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
+  return (
+    <div className="bg-[#1a1614] border border-[#4A2C20]/40 rounded-2xl p-4 flex flex-col gap-1">
+      <p className="text-[#E8D8B8]/40 text-xs uppercase tracking-widest">{label}</p>
+      <p className="text-2xl font-bold text-[#E8D8B8]">{value}</p>
+      {sub && <p className="text-xs text-[#C59A4A]">{sub}</p>}
+    </div>
+  );
+}
 
 export default function ReservationsAdmin() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("");
+  const [search, setSearch] = useState("");
   const [whatsappLinks, setWhatsappLinks] = useState<Record<string, string>>({});
   const [notes, setNotes] = useState<Record<string, string>>({});
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [updating, setUpdating] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -59,31 +72,13 @@ export default function ReservationsAdmin() {
   }, [filter]);
 
   useEffect(() => {
-    let ignore = false;
-
-    (async () => {
-      try {
-        const res = await fetch(`/api/reservations${filter ? `?status=${filter}` : ""}`);
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        if (!ignore) {
-          setReservations(data.reservations);
-          setError(null);
-        }
-      } catch {
-        if (!ignore) setError("Impossible de charger les réservations.");
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    })();
-
-    return () => {
-      ignore = true;
-    };
-  }, [filter]);
+    setLoading(true);
+    load();
+  }, [load]);
 
   const updateStatus = async (id: string, status: string) => {
     const statusNote = notes[id]?.trim() || undefined;
+    setUpdating(id + status);
     try {
       const res = await fetch(`/api/reservations/${id}`, {
         method: "PATCH",
@@ -98,128 +93,205 @@ export default function ReservationsAdmin() {
       await load();
     } catch {
       setError("Échec de la mise à jour du statut.");
+    } finally {
+      setUpdating(null);
     }
   };
 
+  const filtered = reservations.filter((r) => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return r.name.toLowerCase().includes(q) || r.phone.includes(q) || (r.email ?? "").toLowerCase().includes(q);
+  });
+
+  const pending   = reservations.filter((r) => r.status === "PENDING").length;
+  const confirmed = reservations.filter((r) => r.status === "CONFIRMED").length;
+  const today = new Date().toISOString().split("T")[0];
+  const todayCount = reservations.filter((r) => r.date === today).length;
+
   return (
-    <div>
-      <div className="flex items-center gap-3 mb-6">
-        <select
-          value={filter}
-          onChange={(e) => {
-            setLoading(true);
-            setFilter(e.target.value);
-          }}
-          className="bg-[#171310] border border-[#4A2C20] rounded-lg px-3 py-2 text-sm text-[#E8D8B8] outline-none"
-        >
-          <option value="">Tous les statuts</option>
-          {reservationStatusValues.map((s) => (
-            <option key={s} value={s}>
-              {statusLabels[s]}
-            </option>
-          ))}
-        </select>
+    <div className="space-y-6">
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Total" value={reservations.length} />
+        <StatCard label="En attente" value={pending} sub={pending > 0 ? "À traiter" : "Aucune"} />
+        <StatCard label="Confirmées" value={confirmed} />
+        <StatCard label="Aujourd'hui" value={todayCount} sub={today} />
+      </div>
+
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        {/* Search */}
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#E8D8B8]/30" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom, téléphone, email…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full bg-[#1a1614] border border-[#4A2C20]/50 rounded-xl pl-11 pr-4 py-2.5 text-sm text-[#E8D8B8] placeholder:text-[#E8D8B8]/25 outline-none focus:border-[#C59A4A]/60 transition-colors"
+          />
+        </div>
+        {/* Filter */}
+        <div className="relative">
+          <select
+            value={filter}
+            onChange={(e) => { setLoading(true); setFilter(e.target.value); }}
+            className="appearance-none bg-[#1a1614] border border-[#4A2C20]/50 rounded-xl px-4 py-2.5 pr-8 text-sm text-[#E8D8B8] outline-none focus:border-[#C59A4A]/60 transition-colors cursor-pointer"
+          >
+            <option value="">Tous les statuts</option>
+            {reservationStatusValues.map((s) => (
+              <option key={s} value={s}>{statusConfig[s]?.emoji} {statusLabels[s]}</option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#E8D8B8]/40 pointer-events-none" />
+        </div>
+        {/* Refresh */}
         <button
-          onClick={() => {
-            setLoading(true);
-            load();
-          }}
-          className="flex items-center gap-2 text-sm text-[#C59A4A] hover:text-[#B86B32]"
+          onClick={() => { setLoading(true); load(); }}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#4A2C20]/50 bg-[#1a1614] text-sm text-[#C59A4A] hover:bg-[#4A2C20]/20 transition-colors"
         >
-          <RefreshCw className="w-4 h-4" /> Actualiser
+          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <span className="hidden sm:inline">Actualiser</span>
         </button>
       </div>
 
-      {error && <p className="text-red-400 mb-4">{error}</p>}
+      {/* Error */}
+      {error && (
+        <div className="bg-red-950/30 border border-red-800/50 text-red-400 text-sm rounded-xl px-4 py-3">
+          ⚠ {error}
+        </div>
+      )}
+
+      {/* List */}
       {loading ? (
-        <p className="text-[#E8D8B8]/60">Chargement...</p>
-      ) : reservations.length === 0 ? (
-        <p className="text-[#E8D8B8]/60">Aucune réservation.</p>
+        <div className="flex flex-col items-center justify-center py-20 gap-3 text-[#E8D8B8]/40">
+          <div className="w-8 h-8 border-2 border-[#4A2C20] border-t-[#C59A4A] rounded-full animate-spin" />
+          <p className="text-sm">Chargement des réservations…</p>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 gap-2 text-[#E8D8B8]/30">
+          <Calendar className="w-10 h-10 opacity-30" />
+          <p className="text-sm">Aucune réservation trouvée</p>
+        </div>
       ) : (
-        <div className="space-y-4">
-          {reservations.map((r) => (
-            <div
-              key={r.id}
-              className="bg-[#4A2C20]/10 border border-[#4A2C20]/40 rounded-xl p-5 flex flex-col md:flex-row md:items-start gap-4"
-            >
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-[#E8D8B8]">{r.name}</span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full border ${statusColors[r.status]}`}
-                  >
-                    {statusLabels[r.status]}
-                  </span>
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full border ${spaceColors[r.space] ?? "bg-gray-500/20 text-gray-300 border-gray-500/40"}`}
-                  >
-                    {spaceLabels[r.space] ?? r.space}
-                  </span>
-                </div>
-                <p className="text-sm text-[#E8D8B8]/70">
-                  {r.date} à {r.time} · {r.guests} pers. · {spaceLabels[r.space] ?? r.space}
-                </p>
-                <p className="text-sm text-[#E8D8B8]/70">
-                  {r.phone}
-                  {r.email ? ` · ${r.email}` : ""}
-                </p>
-                {r.message && <p className="text-sm text-[#E8D8B8]/50 italic">« {r.message} »</p>}
-                {whatsappLinks[r.id] && (
-                  <a
-                    href={whatsappLinks[r.id]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-[#25D366] hover:underline mt-1"
-                  >
-                    <Image
-                      src="/images/whatsapp-official.webp"
-                      alt="WhatsApp"
-                      width={16}
-                      height={16}
-                    /> Contacter sur WhatsApp
-                  </a>
+        <div className="space-y-3">
+          {filtered.map((r) => {
+            const sc = statusConfig[r.status] ?? statusConfig.OTHER;
+            const sp = spaceConfig[r.space] ?? { color: "text-gray-300", bg: "bg-gray-500/10", border: "border-gray-500/30" };
+            const isExpanded = expanded === r.id;
+
+            return (
+              <div
+                key={r.id}
+                className={`bg-[#1a1614] border rounded-2xl overflow-hidden transition-all duration-200 ${
+                  isExpanded ? "border-[#C59A4A]/30" : "border-[#4A2C20]/40 hover:border-[#4A2C20]/70"
+                }`}
+              >
+                {/* Card header — always visible */}
+                <button
+                  onClick={() => setExpanded(isExpanded ? null : r.id)}
+                  className="w-full text-left px-5 py-4 flex flex-wrap md:flex-nowrap items-center gap-4"
+                >
+                  {/* Status dot */}
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${sc.dot}`} />
+
+                  {/* Name + badges */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="font-semibold text-[#E8D8B8] truncate">{r.name}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${sc.bg} ${sc.color} ${sc.border}`}>
+                        {sc.emoji} {statusLabels[r.status]}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border ${sp.bg} ${sp.color} ${sp.border}`}>
+                        {spaceLabels[r.space] ?? r.space}
+                      </span>
+                    </div>
+                    {/* Date / time / guests inline */}
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-[#E8D8B8]/50">
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{r.date}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.time}</span>
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{r.guests} pers.</span>
+                    </div>
+                  </div>
+
+                  {/* Expand chevron */}
+                  <ChevronDown className={`w-4 h-4 text-[#E8D8B8]/30 flex-shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Expanded panel */}
+                {isExpanded && (
+                  <div className="px-5 pb-5 border-t border-[#4A2C20]/30 pt-4 grid md:grid-cols-2 gap-5">
+                    {/* Contact info */}
+                    <div className="space-y-3">
+                      <p className="text-[#C59A4A] text-xs uppercase tracking-widest font-semibold mb-2">Contact</p>
+                      <div className="flex items-center gap-2 text-sm text-[#E8D8B8]/80">
+                        <Phone className="w-4 h-4 text-[#C59A4A]/60 flex-shrink-0" />
+                        <a href={`tel:${r.phone}`} className="hover:text-[#C59A4A] transition-colors">{r.phone}</a>
+                      </div>
+                      {r.email && (
+                        <div className="flex items-center gap-2 text-sm text-[#E8D8B8]/80">
+                          <Mail className="w-4 h-4 text-[#C59A4A]/60 flex-shrink-0" />
+                          <a href={`mailto:${r.email}`} className="hover:text-[#C59A4A] transition-colors truncate">{r.email}</a>
+                        </div>
+                      )}
+                      {r.message && (
+                        <div className="flex items-start gap-2 text-sm text-[#E8D8B8]/60 italic">
+                          <MessageSquare className="w-4 h-4 text-[#C59A4A]/60 flex-shrink-0 mt-0.5" />
+                          <span>« {r.message} »</span>
+                        </div>
+                      )}
+                      {whatsappLinks[r.id] && (
+                        <a
+                          href={whatsappLinks[r.id]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm bg-[#25D366] text-white px-4 py-2 rounded-xl font-medium hover:bg-[#20bd5a] transition-colors mt-1"
+                        >
+                          <Image src="/images/whatsapp-official.webp" alt="WA" width={16} height={16} />
+                          Contacter sur WhatsApp
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Status update */}
+                    <div className="space-y-3">
+                      <p className="text-[#C59A4A] text-xs uppercase tracking-widest font-semibold mb-2">Mettre à jour le statut</p>
+                      <input
+                        type="text"
+                        placeholder="Note interne (optionnel)…"
+                        value={notes[r.id] ?? ""}
+                        onChange={(e) => setNotes((prev) => ({ ...prev, [r.id]: e.target.value }))}
+                        className="w-full bg-[#0F0D0A] border border-[#4A2C20]/60 rounded-xl px-3 py-2 text-sm text-[#E8D8B8] placeholder:text-[#E8D8B8]/25 outline-none focus:border-[#C59A4A]/60 transition-colors"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        {reservationStatusValues.map((s) => {
+                          const ssc = statusConfig[s];
+                          const isActive = s === r.status;
+                          const isLoading = updating === r.id + s;
+                          return (
+                            <button
+                              key={s}
+                              onClick={() => updateStatus(r.id, s)}
+                              disabled={isActive || isLoading}
+                              className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border font-medium transition-all ${
+                                isActive
+                                  ? `${ssc.bg} ${ssc.color} ${ssc.border} opacity-100 ring-1 ring-current`
+                                  : `${ssc.bg} ${ssc.color} ${ssc.border} hover:brightness-125 disabled:opacity-30`
+                              }`}
+                            >
+                              {isLoading && <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />}
+                              {ssc.emoji} {statusLabels[s]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
-
-              <div className="flex flex-col gap-2 w-full md:w-64">
-                <input
-                  type="text"
-                  placeholder="Note (optionnel)"
-                  value={notes[r.id] ?? ""}
-                  onChange={(e) => setNotes((prev) => ({ ...prev, [r.id]: e.target.value }))}
-                  className="bg-[#171310] border border-[#4A2C20] rounded-lg px-3 py-1.5 text-sm text-[#E8D8B8] outline-none"
-                />
-                <div className="flex flex-wrap gap-2">
-                  {reservationStatusValues.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => updateStatus(r.id, s)}
-                      disabled={s === r.status}
-                      className={`text-xs px-3 py-1.5 rounded-lg border transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${statusColors[s]} hover:brightness-125`}
-                    >
-                      {statusLabels[s]}
-                    </button>
-                  ))}
-                  {whatsappLinks[r.id] && (
-                    <a
-                      href={whatsappLinks[r.id]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-[#25D366] text-white hover:bg-[#20bd5a] transition-colors font-medium"
-                    >
-                      <Image
-                        src="/images/whatsapp-official.webp"
-                        alt="WhatsApp"
-                        width={14}
-                        height={14}
-                      />
-                      WhatsApp
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
