@@ -1,63 +1,241 @@
-lacachette
-LA CACHETTE — Bar • Restaurant • Lounge Vintage Africain à Ékié, Yaoundé 🇨🇲. Site web moderne développé avec Next.js, TypeScript et Tailwind CSS, présentant l’expérience, le menu, la galerie, les événements et les réservations.
+<div align="center">
 
+# 🍽️ LA CACHETTE
+### Restaurant-Bar · Lounge Vintage Africain · Ékié, Yaoundé 🇨🇲
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+*« L'ambiance se cache ici. »*
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss)](https://tailwindcss.com)
+[![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?logo=prisma)](https://prisma.io)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ECF8E?logo=supabase)](https://supabase.com)
+[![Vercel](https://img.shields.io/badge/Deployed_on-Vercel-black?logo=vercel)](https://lacachette-nu.vercel.app)
 
-First, run the development server:
+[🌐 Site en ligne](https://lacachette-nu.vercel.app) · [🔧 Admin](https://lacachette-nu.vercel.app/admin) · [📋 Supabase](https://supabase.com/dashboard/project/knbbyasiowpsmcxhiyls)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+</div>
+
+---
+
+## ✨ Fonctionnalités
+
+### Site public
+| Fonctionnalité | Description |
+|---|---|
+| 🏠 **Page d'accueil** | Hero animé, ambiance lounge, slogan |
+| 📖 **Menu** | Cartes par catégorie (entrées, plats, boissons…) |
+| 🖼️ **Galerie** | Photos ambiance, VIP Lounge, événements |
+| 📅 **Réservation en ligne** | Formulaire avec sélection de créneaux en temps réel |
+| 🗓️ **Disponibilité dynamique** | Créneaux colorés selon capacité restante par espace |
+| ✅ **Page de confirmation** | `/reservation/[id]` — statut + QR code partageable |
+| 📱 **WhatsApp flottant** | Bouton de contact direct |
+
+### Espaces & capacités
+| Espace | Capacité | Horaires |
+|---|---|---|
+| 🌿 Terrasse | 15 personnes | 11h00 – 23h00 |
+| 🍽️ Salle Principale | 20 personnes | 11h00 – 23h00 |
+| 💎 VIP Lounge | 4 personnes | 18h00 – 00h00 |
+| 🔒 Privatisation VIP | 2 personnes | 18h00 – 00h00 |
+
+### Administration (`/admin`)
+| Fonctionnalité | Description |
+|---|---|
+| 🔐 **Login sécurisé** | Email + mot de passe + **2FA OTP** (email + Telegram) |
+| 📋 **Gestion des réservations** | Liste, recherche, filtres par statut |
+| 🔄 **Actions rapides** | Confirmer / Annuler / Reporter / Dupliquer / **Supprimer** |
+| 💬 **WhatsApp en 1 clic** | Lien pré-rempli à chaque changement de statut |
+| 👥 **Gestion du personnel** | Créer des comptes Staff / Admin |
+| 🔔 **Rappels automatiques** | Telegram J-1 pour toutes les réservations confirmées |
+
+### Notifications
+| Canal | Déclencheur |
+|---|---|
+| 📧 Email (Brevo) | Nouvelle réservation → admin + client |
+| 📱 Telegram | Nouvelle réservation + rappel J-1 automatique |
+| 🔐 Email + Telegram | Code OTP 2FA lors du login admin |
+| 📲 WhatsApp | Lien manuel après chaque action admin |
+
+---
+
+## 🛠️ Stack technique
+
+```
+Next.js 15 (App Router)    →  Framework React full-stack
+TypeScript 5               →  Typage statique
+Tailwind CSS v4            →  Styles utilitaires
+Prisma 6 + Supabase        →  ORM + base de données PostgreSQL
+Brevo (ex-Sendinblue)      →  Envoi d'emails transactionnels
+Telegram Bot API           →  Alertes & OTP backup
+jose + bcryptjs            →  JWT sessions + hash mots de passe
+Framer Motion              →  Animations UI
+Vercel                     →  Hébergement + Cron Jobs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Installation locale
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prérequis
+- Node.js 18+
+- Compte [Supabase](https://supabase.com) (gratuit)
+- Compte [Brevo](https://app.brevo.com) (gratuit)
+- Bot Telegram via [@BotFather](https://t.me/BotFather)
 
-## Backend — Réservations & Administration
+### 1. Cloner et installer
+```bash
+git clone https://github.com/chreol/lacachette.git
+cd lacachette
+npm install
+```
 
-Le formulaire de réservation, les notifications et la page `/admin` nécessitent une base de données et un service d'email. Configuration :
+### 2. Variables d'environnement
+Crée un fichier `.env.local` à la racine :
 
-1. **Copier `.env.example` en `.env`** et remplir les valeurs.
-2. **Base de données (Supabase)** : créer un projet sur [supabase.com](https://supabase.com), récupérer les chaînes de connexion (`DATABASE_URL` en pooling port 6543, `DIRECT_URL` en direct port 5432) depuis *Project Settings → Database*.
-3. **Email (Brevo)** : générer une clé API sur [app.brevo.com](https://app.brevo.com) (*SMTP & API → API Keys*) et vérifier le domaine d'envoi (`chreolempire.com`) dans *Senders & IP*. Renseigner `BREVO_API_KEY`, `EMAIL_FROM_ADDRESS`, `RESERVATION_NOTIFICATION_EMAIL`.
-4. **Session admin** : générer une valeur aléatoire pour `SESSION_SECRET` (32+ caractères), ex. `openssl rand -base64 32`.
-5. **Alertes Telegram (optionnel)** : créer un bot via [@BotFather](https://t.me/BotFather) sur Telegram, récupérer le token, puis récupérer l'ID du chat destinataire. Renseigner `TELEGRAM_BOT_TOKEN` et `TELEGRAM_CHAT_ID`.
-6. **Créer les tables** :
-   ```bash
-   npm run db:migrate -- --name init
-   ```
-7. **Créer le premier compte admin** (renseigner `ADMIN_EMAIL` / `ADMIN_NAME` / `ADMIN_PASSWORD` dans `.env`, ou répondre aux invites) :
-   ```bash
-   npm run seed:admin
-   ```
-8. Se connecter sur `/admin/login`. Un admin peut ensuite créer d'autres comptes staff depuis `/admin/users`.
+```env
+# Base de données Supabase
+DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
 
-**Notifications WhatsApp** : pas d'automatisation officielle (nécessiterait un compte Meta Business vérifié et payant). La page admin génère un lien `wa.me` pré-rempli à chaque changement de statut, à envoyer manuellement en un clic.
+# Sessions admin (générer : openssl rand -base64 32)
+SESSION_SECRET="votre-secret-aleatoire-32-caracteres-minimum"
 
-En production (Vercel), renseigner les mêmes variables d'environnement dans *Project Settings → Environment Variables*.
+# Email (Brevo)
+BREVO_API_KEY="xkeysib-..."
+EMAIL_FROM_ADDRESS="contact@votre-domaine.com"
+EMAIL_FROM_NAME="La Cachette RESTO"
+RESERVATION_NOTIFICATION_EMAIL="admin@votre-domaine.com"
 
-## Learn More
+# Telegram Bot
+TELEGRAM_BOT_TOKEN="123456789:AAE-..."
+TELEGRAM_CHAT_ID="votre_chat_id"
 
-To learn more about Next.js, take a look at the following resources:
+# Compte admin initial (pour le script seed)
+ADMIN_EMAIL="admin@votre-domaine.com"
+ADMIN_NAME="Admin"
+ADMIN_PASSWORD="VotreMotDePasse!"
+ADMIN_URL="http://localhost:3000/admin"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Cron rappels J-1 (générer : openssl rand -base64 32)
+CRON_SECRET="votre-cron-secret"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# URL publique du site
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+```
 
-## Deploy on Vercel
+### 3. Base de données
+```bash
+# Générer le client Prisma
+npx prisma generate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Appliquer les migrations (connexion directe port 5432)
+npx prisma migrate deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Créer le premier compte admin
+npm run seed:admin
+```
+
+> **Supabase uniquement** — Si la migration échoue, exécuter ce SQL dans le [SQL Editor Supabase](https://supabase.com/dashboard/sql) :
+> ```sql
+> -- Tables créées par Prisma migrate
+> -- OTP 2FA (si non appliqué via migrate)
+> ALTER TABLE "StaffUser" ADD COLUMN IF NOT EXISTS "otpCode" TEXT;
+> ALTER TABLE "StaffUser" ADD COLUMN IF NOT EXISTS "otpExpiresAt" TIMESTAMPTZ;
+> ```
+
+### 4. Lancer en développement
+```bash
+npm run dev
+```
+→ [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🌐 Déploiement Vercel
+
+### Variables d'environnement à configurer
+Dans **Vercel → Project Settings → Environment Variables**, ajouter toutes les variables du `.env.local` avec les valeurs de production.
+
+> ⚠️ **Important** : `DATABASE_URL` doit utiliser le **port 5432** (connexion directe) sur Vercel — le port 6543 (pgbouncer) est bloqué depuis AWS us-east-1.
+
+### Cron Job (rappels J-1)
+Le fichier `vercel.json` configure un cron quotidien à **10h00 Yaoundé (7h UTC)** :
+```json
+{
+  "crons": [{ "path": "/api/cron/reminders", "schedule": "0 7 * * *" }]
+}
+```
+La route est protégée par le header `Authorization: Bearer CRON_SECRET`.
+
+---
+
+## 📁 Structure du projet
+
+```
+src/
+├── app/
+│   ├── page.tsx                      # Page d'accueil publique
+│   ├── reservation/[id]/page.tsx     # Page confirmation réservation
+│   ├── admin/                        # Interface d'administration
+│   │   ├── login/page.tsx            # Login 2FA (email + OTP)
+│   │   ├── page.tsx                  # Dashboard admin
+│   │   └── users/page.tsx            # Gestion du personnel
+│   └── api/
+│       ├── auth/login/               # Authentification step 1
+│       ├── auth/otp/                 # Vérification OTP step 2
+│       ├── reservations/             # CRUD réservations
+│       ├── availability/             # Créneaux disponibles temps réel
+│       └── cron/reminders/           # Rappels Telegram J-1
+├── components/
+│   ├── ReservationSection.tsx        # Formulaire de réservation public
+│   ├── admin/
+│   │   ├── AdminNav.tsx              # Navigation admin
+│   │   ├── ReservationsAdmin.tsx     # Liste + gestion des réservations
+│   │   └── StaffUsersAdmin.tsx       # Gestion du personnel
+│   └── WhatsAppButton.tsx            # Bouton flottant WhatsApp
+├── lib/
+│   ├── availability.ts               # Logique créneaux + ZONE_CONFIG
+│   ├── auth.ts                       # JWT + bcrypt
+│   ├── email.ts + email-templates.ts # Emails transactionnels
+│   ├── telegram.ts                   # Bot Telegram
+│   ├── prisma.ts                     # Client Prisma singleton
+│   ├── session.ts                    # Gestion cookie session
+│   └── validation.ts                 # Schémas Zod
+prisma/
+└── schema.prisma                     # Modèles BDD (Reservation, StaffUser)
+```
+
+---
+
+## 🔐 Sécurité
+
+- **2FA obligatoire** pour l'accès admin (OTP valable 5 min, usage unique)
+- **JWT sessions** signées (7 jours, cookie `httpOnly`)
+- **Hash bcrypt** pour mots de passe et codes OTP
+- **Validation Zod** sur toutes les entrées API
+- **RLS Supabase** configurable par table
+- **Cron protégé** par `CRON_SECRET` en header `Authorization`
+- Messages d'erreur génériques (pas de fuite d'info sur l'existence des emails)
+
+---
+
+## 📞 Contacts
+
+| | |
+|---|---|
+| 📧 Email | restolacachatte@chreolempire.com |
+| 📧 Email alt | lacachette@resto.chreolempire.com |
+| 📱 WhatsApp | +237 693 547 268 |
+| 🤖 Telegram Bot | @LacachetteResto_Bot |
+| 🌐 Site | [resto.chreolempire.com](https://resto.chreolempire.com) |
+
+---
+
+<div align="center">
+
+**La Cachette** · Ékié, Yaoundé · Cameroun 🇨🇲
+
+*Développé avec ❤️ par [Chreol Empire](https://chreolempire.com)*
+
+</div>
