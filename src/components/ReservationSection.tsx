@@ -23,6 +23,14 @@ const SPACE_LABELS: Record<string, string> = {
   'privatisation-vip': 'Privatisation VIP',
 };
 
+// Capacités max par espace (doivent correspondre à availability.ts ZONE_CONFIG)
+const SPACE_MAX_GUESTS: Record<string, number> = {
+  terrasse: 15,
+  salle: 20,
+  vip: 4,
+  'privatisation-vip': 2,
+};
+
 const inputClassName = "w-full bg-[#171310] border border-[#4A2C20] rounded-lg px-4 py-3 pl-11 text-[#E8D8B8] focus:border-[#C59A4A] focus:ring-1 focus:ring-[#C59A4A] transition-all duration-300 placeholder:text-[#E8D8B8]/30 outline-none";
 const iconClassName = "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#C59A4A]";
 
@@ -182,38 +190,45 @@ export default function ReservationSection() {
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Row 1: Nom + Téléphone WhatsApp */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                {/* Row 1: Nom complet — pleine largeur */}
+                <div className="relative">
+                  <User className={iconClassName} />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nom complet"
+                    value={formState.name}
+                    onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                    className={inputClassName}
+                  />
+                </div>
+
+                {/* Row 2: WhatsApp — pleine largeur avec logo + message info */}
+                <div className="flex flex-col gap-1.5">
                   <div className="relative">
-                    <User className={iconClassName} />
+                    <Image
+                      src="/images/whatsapp-official.webp"
+                      alt="WhatsApp"
+                      width={20}
+                      height={20}
+                      className="absolute left-4 top-1/2 -translate-y-1/2"
+                    />
                     <input
-                      type="text"
+                      type="tel"
                       required
-                      placeholder="Nom complet"
-                      value={formState.name}
-                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                      placeholder="+237 6XX XXX XXX"
+                      maxLength={15}
+                      value={formState.phone}
+                      onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
                       className={inputClassName}
                     />
                   </div>
-                  <div className="flex flex-col gap-1.5">
-                    <div className="relative">
-                      <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#25D366]" />
-                      <input
-                        type="tel"
-                        required
-                        placeholder="WhatsApp actif (ex: +237 6XX XXX XXX)"
-                        value={formState.phone}
-                        onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
-                        className={inputClassName}
-                      />
-                    </div>
-                    <span className="text-xs text-[#E8D8B8]/40 pl-1">
-                      Ce numéro doit être actif sur WhatsApp — nous vous contacterons via ce canal.
-                    </span>
-                  </div>
+                  <span className="block w-full text-xs text-[#E8D8B8]/40 pl-1">
+                    Ce numéro doit être actif sur WhatsApp — nous vous contacterons via ce canal.
+                  </span>
                 </div>
 
-                {/* Row 2: Email */}
+                {/* Row 3: Email — pleine largeur */}
                 <div className="relative">
                   <Mail className={iconClassName} />
                   <input
@@ -232,26 +247,42 @@ export default function ReservationSection() {
                     <input
                       type="number"
                       min="1"
-                      max="50"
+                      max={SPACE_MAX_GUESTS[formState.space] ?? 20}
                       required
                       placeholder="Nombre de convives"
                       value={formState.guests}
-                      onChange={(e) => setFormState({ ...formState, guests: parseInt(e.target.value) || 2 })}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value) || 1;
+                        const max = SPACE_MAX_GUESTS[formState.space] ?? 20;
+                        setFormState({ ...formState, guests: Math.min(val, max) });
+                      }}
                       className={inputClassName}
                     />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[#E8D8B8]/30 pointer-events-none">
+                      max {SPACE_MAX_GUESTS[formState.space] ?? 20}
+                    </span>
                   </div>
                   <div className="relative">
                     <MapPin className={iconClassName} />
                     <select
                       required
                       value={formState.space}
-                      onChange={(e) => handleSpaceChange(e.target.value as ReservationForm['space'])}
+                      onChange={(e) => {
+                        const newSpace = e.target.value as ReservationForm['space'];
+                        const newMax = SPACE_MAX_GUESTS[newSpace] ?? 20;
+                        setFormState(prev => ({
+                          ...prev,
+                          space: newSpace,
+                          time: '',
+                          guests: Math.min(prev.guests, newMax),
+                        }));
+                      }}
                       className={`${inputClassName} appearance-none cursor-pointer`}
                     >
-                      <option value="terrasse">Terrasse</option>
-                      <option value="salle">Salle Principale</option>
-                      <option value="vip">VIP Lounge</option>
-                      <option value="privatisation-vip">Privatisation VIP</option>
+                      <option value="terrasse">Terrasse (max 15 pers.)</option>
+                      <option value="salle">Salle Principale (max 20 pers.)</option>
+                      <option value="vip">VIP Lounge (max 4 pers.)</option>
+                      <option value="privatisation-vip">Privatisation VIP (max 2 pers.)</option>
                     </select>
                   </div>
                 </div>

@@ -43,10 +43,10 @@ export function generateSlots(startTime: string, endTime: string, intervalMinute
 }
 
 export const ZONE_CONFIG: Record<string, ZoneConfig> = {
-  terrasse: { capacity: 30, slots: generateSlots('11:00', '23:00', 30), label: 'Terrasse' },
-  salle: { capacity: 40, slots: generateSlots('11:00', '23:00', 30), label: 'Salle Principale' },
-  vip: { capacity: 12, slots: generateSlots('18:00', '00:00', 30), label: 'VIP Lounge' },
-  'privatisation-vip': { capacity: 1, slots: generateSlots('18:00', '00:00', 30), label: 'Privatisation VIP', exclusive: true },
+  terrasse:           { capacity: 15, slots: generateSlots('11:00', '23:00', 30), label: 'Terrasse' },
+  salle:              { capacity: 20, slots: generateSlots('11:00', '23:00', 30), label: 'Salle Principale' },
+  vip:                { capacity: 4,  slots: generateSlots('18:00', '00:00', 30), label: 'VIP Lounge' },
+  'privatisation-vip':{ capacity: 2,  slots: generateSlots('18:00', '00:00', 30), label: 'Privatisation VIP', exclusive: true },
 };
 
 export async function getAvailableSlots(date: string, space: string): Promise<SlotAvailability[]> {

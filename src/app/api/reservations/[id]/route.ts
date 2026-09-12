@@ -114,3 +114,21 @@ export async function PATCH(
   });
 }
 
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  const { id } = await params;
+
+  try {
+    await prisma.reservation.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Réservation introuvable" }, { status: 404 });
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
-import { RefreshCw, Search, Calendar, Clock, Users, MessageSquare, Phone, Mail, ChevronDown } from "lucide-react";
+import { RefreshCw, Search, Calendar, Clock, Users, MessageSquare, Phone, Mail, ChevronDown, Trash2, Copy } from "lucide-react";
 import { statusLabels, spaceLabels } from "@/lib/reservation-mapping";
 import { reservationStatusValues } from "@/lib/validation";
 
@@ -56,6 +56,8 @@ export default function ReservationsAdmin() {
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [duplicating, setDuplicating] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -95,6 +97,47 @@ export default function ReservationsAdmin() {
       setError("Échec de la mise à jour du statut.");
     } finally {
       setUpdating(null);
+    }
+  };
+
+  const deleteReservation = async (id: string, name: string) => {
+    if (!confirm(`Supprimer définitivement la réservation de ${name} ?`)) return;
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      if (expanded === id) setExpanded(null);
+      await load();
+    } catch {
+      setError("Échec de la suppression.");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const duplicateReservation = async (r: Reservation) => {
+    setDuplicating(r.id);
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: r.name + " (copie)",
+          phone: r.phone,
+          email: r.email ?? "",
+          date: r.date,
+          time: r.time,
+          guests: r.guests,
+          space: r.space,
+          message: r.message ?? "",
+        }),
+      });
+      if (!res.ok) throw new Error();
+      await load();
+    } catch {
+      setError("Échec de la duplication.");
+    } finally {
+      setDuplicating(null);
     }
   };
 
@@ -285,6 +328,30 @@ export default function ReservationsAdmin() {
                             </button>
                           );
                         })}
+                      </div>
+
+                      {/* Actions — Dupliquer / Supprimer */}
+                      <div className="pt-3 border-t border-[#4A2C20]/20 flex items-center gap-2">
+                        <button
+                          onClick={() => duplicateReservation(r)}
+                          disabled={duplicating === r.id}
+                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 text-blue-300 hover:brightness-125 transition-all disabled:opacity-50"
+                        >
+                          {duplicating === r.id
+                            ? <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                            : <Copy className="w-3 h-3" />}
+                          Dupliquer
+                        </button>
+                        <button
+                          onClick={() => deleteReservation(r.id, r.name)}
+                          disabled={deleting === r.id}
+                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 hover:brightness-125 transition-all disabled:opacity-50"
+                        >
+                          {deleting === r.id
+                            ? <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                            : <Trash2 className="w-3 h-3" />}
+                          Supprimer
+                        </button>
                       </div>
                     </div>
                   </div>
