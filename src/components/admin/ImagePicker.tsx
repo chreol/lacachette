@@ -91,8 +91,7 @@ export default function ImagePicker({
       </div>
       {error && <p className="text-xs text-red-400">{error}</p>}
       <p className="text-[11px] text-[#E8D8B8]/40">
-        WebP / JPG / PNG · max 1,5 Mo. Avec Supabase Storage la photo est visible tout de suite ;
-        avec GitHub, après le déploiement Vercel.
+        WebP / JPG / PNG · max 1,5 Mo. La photo est visible tout de suite, sans redéploiement.
       </p>
     </div>
   );

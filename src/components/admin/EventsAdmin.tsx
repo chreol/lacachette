@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import type { LiveEvent } from "@/types/restaurant";
 import ImagePicker from "@/components/admin/ImagePicker";
+import { mediaSrc } from "@/lib/site-images";
 
 type EventRow = LiveEvent & { isPublished?: boolean };
 
@@ -236,7 +237,7 @@ export default function EventsAdmin() {
             <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#4A2C20] shrink-0">
               {event.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={event.image} alt="" className="w-full h-full object-cover" />
+                <img src={mediaSrc(event.image)} alt="" className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-[#4A2C20]" />
               )}

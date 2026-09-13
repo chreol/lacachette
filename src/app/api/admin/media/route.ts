@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          "Ajoute SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY (photos immédiates) ou GITHUB_TOKEN (commit repo) dans Vercel, puis redéploie.",
+          "DATABASE_URL est manquant : les photos admin sont enregistrées dans Postgres.",
       },
       { status: 503 },
     );
@@ -78,10 +78,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       ...result,
-      hint:
-        result.storage === "supabase"
-          ? "Photo en ligne tout de suite. Rafraîchis la page."
-          : "Vercel redéploie tout seul en 1–2 min. Ensuite rafraîchis le site.",
+      hint: "Photo enregistrée. Rafraîchis la page si tu ne la vois pas tout de suite.",
     });
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Erreur stockage";

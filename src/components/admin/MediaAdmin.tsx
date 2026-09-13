@@ -47,10 +47,8 @@ export default function MediaAdmin() {
     <div className="space-y-6">
       {configured === false && (
         <p className="text-sm text-amber-300/90 bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3">
-          Pour publier depuis l’admin : ajoute <code className="text-[#C59A4A]">SUPABASE_URL</code> +{" "}
-          <code className="text-[#C59A4A]">SUPABASE_SERVICE_ROLE_KEY</code> (recommandé, photos immédiates)
-          ou un <code className="text-[#C59A4A]">GITHUB_TOKEN</code> (commit dans le repo) dans Vercel, puis
-          redéploie.
+          La base de données n’est pas joignable. Vérifie <code className="text-[#C59A4A]">DATABASE_URL</code> sur
+          Vercel, puis redéploie.
         </p>
       )}
       {message && (

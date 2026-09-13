@@ -37,7 +37,7 @@ export default function HeroSection({
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/entree.webp"
+          src="/api/media/entree.webp"
           alt="Entrée bambou de La Cachette, restaurant-bar Vintage Africain à Ékié, Yaoundé"
           fill
           priority

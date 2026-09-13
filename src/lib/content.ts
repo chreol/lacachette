@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { mediaSrc } from "@/lib/site-images";
 import {
   liveEvents as fallbackEvents,
   menuItems as fallbackMenu,
@@ -44,7 +45,7 @@ export function mapDish(row: DishRow): MenuItem & { isAvailable: boolean; sortOr
     badge: (row.badge as MenuItem["badge"]) ?? undefined,
     spices: Array.isArray(row.spices) && row.spices.length ? row.spices : undefined,
     isVegetarian: row.isVegetarian || undefined,
-    image: row.image ?? undefined,
+    image: row.image ? mediaSrc(row.image) : undefined,
     isAvailable: row.isAvailable,
     sortOrder: row.sortOrder,
   };
@@ -59,7 +60,7 @@ export function mapEvent(row: EventRow): LiveEvent & { isPublished: boolean } {
     artist: row.artist,
     genre: row.genre,
     description: row.description,
-    image: row.image ?? undefined,
+    image: row.image ? mediaSrc(row.image) : undefined,
     isPublished: row.isPublished,
   };
 }

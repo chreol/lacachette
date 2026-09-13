@@ -90,3 +90,10 @@ model SiteSetting {
   payload   Json
   updatedAt DateTime @updatedAt
 }
+
+model SiteImage {
+  path      String   @id
+  mime      String
+  bytes     Bytes
+  updatedAt DateTime @updatedAt
+}

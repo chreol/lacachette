@@ -29,7 +29,7 @@ export default async function Footer() {
           <div className="space-y-6">
             <div className="flex items-center gap-4">
               <Image
-                src="/images/logo.webp"
+                src="/api/media/logo.webp"
                 alt="LA CACHETTE"
                 width={60}
                 height={60}
@@ -136,7 +136,7 @@ export default async function Footer() {
               {/* WhatsApp */}
               <div className="flex items-center gap-2">
                 <Image
-                  src="/images/whatsapp-official.webp"
+                  src="/api/media/whatsapp-official.webp"
                   alt="WhatsApp"
                   width={18}
                   height={18}
@@ -223,7 +223,7 @@ export default async function Footer() {
               {tel.replace("+237", "(237)")}
             </a>
             <a href={wa} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm hover:text-[#25D366] transition-colors">
-              <Image src="/images/whatsapp-official.webp" alt="" width={20} height={20} className="shrink-0" />
+              <Image src="/api/media/whatsapp-official.webp" alt="" width={20} height={20} className="shrink-0" />
               WhatsApp {tel}
             </a>
             <a href={`mailto:${site.email}`} className="flex items-center gap-3 text-sm hover:text-[#C59A4A] transition-colors">
@@ -253,7 +253,7 @@ export default async function Footer() {
             className="opacity-50 hover:opacity-100 transition-opacity duration-300"
           >
             <Image
-              src="/images/chreol-empire.png"
+              src="/api/media/chreol-empire.png"
               alt="Chreol Empire"
               width={110}
               height={36}

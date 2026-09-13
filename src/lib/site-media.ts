@@ -1,4 +1,5 @@
 import { commitSiteImage as commitGithubImage, githubMediaConfigured } from "@/lib/github-media";
+import { saveSiteImageBytes } from "@/lib/site-image-store";
 import { isSafeImageName, MAX_IMAGE_BYTES, publicImagePath } from "@/lib/site-images";
 
 const DEFAULT_BUCKET = "site-media";
@@ -15,8 +16,9 @@ export function supabaseMediaConfigured() {
   return Boolean(supabaseUrl() && supabaseKey());
 }
 
+/** Uploads always persist in Postgres (`DATABASE_URL`). Extra backends are optional. */
 export function mediaUploadConfigured() {
-  return githubMediaConfigured() || supabaseMediaConfigured();
+  return Boolean(process.env.DATABASE_URL || process.env.DIRECT_URL);
 }
 
 function mimeForName(fileName: string) {
@@ -82,23 +84,39 @@ async function uploadToSupabase(fileName: string, bytes: Buffer) {
     throw new Error(`Supabase Storage : ${put.status} ${err.slice(0, 220)}`);
   }
 
-  const publicUrl = `${supabaseUrl()}/storage/v1/object/public/${bucket}/${encoded}`;
-  return { path: publicUrl, committed: true as const, storage: "supabase" as const };
+  return { committed: true as const, storage: "supabase" as const };
 }
 
 export async function commitSiteImage(fileName: string, bytes: Buffer, message?: string) {
+  if (!isSafeImageName(fileName)) {
+    throw new Error("Nom de fichier invalide");
+  }
+  if (bytes.length > MAX_IMAGE_BYTES) {
+    throw new Error("Fichier trop lourd (max 1,5 Mo)");
+  }
+
+  await saveSiteImageBytes(fileName, bytes);
+
   if (supabaseMediaConfigured()) {
     try {
-      return await uploadToSupabase(fileName, bytes);
-    } catch (error) {
-      if (!githubMediaConfigured()) throw error;
+      await uploadToSupabase(fileName, bytes);
+    } catch {
+      // Database is the source of truth; Storage is optional.
     }
   }
 
-  if (!githubMediaConfigured()) {
-    throw new Error("Aucun stockage configuré (Supabase Storage ou GITHUB_TOKEN)");
+  // GitHub commits retrigger Vercel; only if explicitly enabled.
+  if (process.env.GITHUB_MEDIA_COMMIT === "1" && githubMediaConfigured()) {
+    try {
+      await commitGithubImage(fileName, bytes, message);
+    } catch {
+      // Keep the DB copy even if GitHub fails.
+    }
   }
 
-  const result = await commitGithubImage(fileName, bytes, message);
-  return { ...result, storage: "github" as const, path: publicImagePath(fileName) };
+  return {
+    path: publicImagePath(fileName),
+    committed: true as const,
+    storage: "database" as const,
+  };
 }

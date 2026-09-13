@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { DoorOpen, TreePalm, Wine, Crown, ChefHat, Sparkles, MapPin } from "lucide-react";
 import { spaces } from "@/types/restaurant";
+import { mediaSrc } from "@/lib/site-images";
 
 const getIcon = (name: string) => {
   switch (name) {
@@ -75,7 +76,7 @@ export default function SpacesSection() {
               <div className="w-full lg:w-1/2 relative group">
                 <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden shadow-2xl transition-all duration-500 group-hover:shadow-[0_0_30px_rgba(197,154,74,0.3)]">
                   <Image
-                    src={currentSpace.image}
+                    src={mediaSrc(currentSpace.image)}
                     alt={currentSpace.name}
                     fill
                     className="object-cover transition-transform duration-700 group-hover:scale-105"

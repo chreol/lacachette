@@ -83,8 +83,8 @@ export const metadata: Metadata = {
     images: [SITE_OG_IMAGE],
   },
   icons: {
-    icon: "/images/logo.webp",
-    apple: "/images/logo.webp",
+    icon: "/api/media/logo.webp",
+    apple: "/api/media/logo.webp",
   },
   verification: process.env.GOOGLE_SITE_VERIFICATION
     ? { google: process.env.GOOGLE_SITE_VERIFICATION }

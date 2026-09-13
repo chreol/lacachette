@@ -46,7 +46,7 @@ export default function Navbar() {
           {/* Logo */}
           <a href="/" className="flex items-center gap-3 group shrink-0">
             <Image
-              src="/images/logo.webp"
+              src="/api/media/logo.webp"
               alt="LA CACHETTE"
               width={50}
               height={50}

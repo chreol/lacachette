@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
 import { Music, Clock } from 'lucide-react';
 import { liveEvents as fallbackEvents, type LiveEvent } from '@/types/restaurant';
+import { mediaSrc } from '@/lib/site-images';
 
 function eventDay(date: string) {
   const d = new Date(`${date}T12:00:00`);
@@ -63,7 +64,7 @@ export default function EventsSection({ events = fallbackEvents }: { events?: Li
                 {event.image ? (
                   <>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={event.image} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+                    <img src={mediaSrc(event.image)} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-[#171310]/45" />
                     <span className="relative z-10 text-[#E8D8B8] font-medium tracking-wide uppercase drop-shadow-lg">
                       {event.genre}

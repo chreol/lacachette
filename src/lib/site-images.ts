@@ -14,14 +14,31 @@ export const GITHUB_IMAGES_DIR = "public/images";
 export const ALLOWED_IMAGE_EXT = ["webp", "png", "jpg", "jpeg"];
 export const MAX_IMAGE_BYTES = 1_500_000;
 
+export function imageFileName(file: string) {
+  return file.replace(/^\/+/, "").replace(/^images\//, "").replace(/^api\/media\//, "");
+}
+
+/** Public URL that serves DB overrides, then files in `public/images`. */
 export function publicImagePath(file: string) {
-  const cleaned = file.replace(/^\/+/, "").replace(/^images\//, "");
-  return `/images/${cleaned}`;
+  return `/api/media/${imageFileName(file)}`;
+}
+
+export function mediaSrc(src?: string | null) {
+  if (!src) return "";
+  if (
+    src.startsWith("http://") ||
+    src.startsWith("https://") ||
+    src.startsWith("data:") ||
+    src.startsWith("blob:")
+  ) {
+    return src;
+  }
+  if (src.startsWith("/api/media/")) return src;
+  return publicImagePath(src);
 }
 
 export function githubImagePath(file: string) {
-  const cleaned = file.replace(/^\/+/, "").replace(/^images\//, "");
-  return `${GITHUB_IMAGES_DIR}/${cleaned}`;
+  return `${GITHUB_IMAGES_DIR}/${imageFileName(file)}`;
 }
 
 export function isSafeImageName(file: string) {

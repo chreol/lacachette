@@ -99,7 +99,7 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen items-center justify-center px-6 relative overflow-hidden">
       {/* Background décor */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_#4A2C20_0%,_transparent_60%)] opacity-20 pointer-events-none" />
-      <div className="absolute inset-0 bg-[url('/images/logo.webp')] bg-center bg-no-repeat opacity-[0.03] bg-[length:600px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('/api/media/logo.webp')] bg-center bg-no-repeat opacity-[0.03] bg-[length:600px] pointer-events-none" />
 
       <div className="relative w-full max-w-sm">
         <div className="bg-[#1a1614]/95 border border-[#4A2C20]/60 rounded-3xl p-8 shadow-2xl shadow-black/60 backdrop-blur-sm">
@@ -110,7 +110,7 @@ export default function AdminLoginPage() {
               <div className="w-16 h-16 rounded-full bg-[#C59A4A]/10 border border-[#C59A4A]/30 flex items-center justify-center">
                 {step === "otp"
                   ? <ShieldCheck className="w-8 h-8 text-[#C59A4A]" />
-                  : <Image src="/images/logo.webp" alt="La Cachette" width={44} height={44} className="rounded-full object-cover" />
+                  : <Image src="/api/media/logo.webp" alt="La Cachette" width={44} height={44} className="rounded-full object-cover" />
                 }
               </div>
             </div>

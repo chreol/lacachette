@@ -15,8 +15,8 @@ export default async function AdminMediaPage() {
           Images du site
         </h1>
         <p className="text-[#E8D8B8]/50 text-sm mb-8 leading-relaxed">
-          Choisis une photo, elle est commitée sur GitHub dans <code className="text-[#C59A4A]">public/images/</code>.
-          Vercel redéploie ensuite tout seul (WebP/JPG/PNG, max 1,5 Mo).
+          Choisis une photo : elle est enregistrée tout de suite (WebP/JPG/PNG, max 1,5 Mo)
+          et remplace l’image correspondante sur le site, sans redéploiement.
         </p>
         <MediaAdmin />
       </main>

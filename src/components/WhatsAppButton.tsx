@@ -47,7 +47,7 @@ export default function WhatsAppButton() {
           <div className="flex items-center justify-between px-4 py-3 bg-[#25D366]">
             <div className="flex items-center gap-2">
               <Image
-                src="/images/whatsapp-official.webp"
+                src="/api/media/whatsapp-official.webp"
                 alt="WhatsApp"
                 width={22}
                 height={22}
@@ -104,7 +104,7 @@ export default function WhatsAppButton() {
           <span className="absolute inset-0 rounded-full bg-[#25D366] opacity-75 animate-ping pointer-events-none" />
         )}
         <Image
-          src="/images/whatsapp-official.webp"
+          src="/api/media/whatsapp-official.webp"
           alt="WhatsApp"
           width={32}
           height={32}

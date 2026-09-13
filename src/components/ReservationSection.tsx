@@ -268,7 +268,7 @@ export default function ReservationSection({ events = fallbackEvents }: { events
                 <div className="flex flex-col gap-1.5">
                   <div className="relative">
                     <Image
-                      src="/images/whatsapp-official.webp"
+                      src="/api/media/whatsapp-official.webp"
                       alt="WhatsApp"
                       width={20}
                       height={20}
@@ -574,7 +574,7 @@ export default function ReservationSection({ events = fallbackEvents }: { events
           {/* Right: Ambient Image */}
           <div className="relative h-full min-h-[400px] lg:min-h-full">
             <Image
-              src="/images/vip.webp"
+              src="/api/media/vip.webp"
               alt="VIP Lounge La Cachette"
               fill
               className="object-cover"

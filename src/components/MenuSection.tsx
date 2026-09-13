@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Flame, UtensilsCrossed, Wine, GlassWater, Leaf, Star, BadgeCheck, ChefHat, Sparkles } from "lucide-react";
 import { menuItems, type MenuCategory, type MenuItem } from "@/types/restaurant";
+import { mediaSrc } from "@/lib/site-images";
 
 const categories: { key: MenuCategory; label: string; icon: React.ElementType }[] = [
   { key: "grillades", label: "Grillades & Braisés", icon: Flame },
@@ -127,7 +128,7 @@ export default function MenuSection({ items = menuItems }: { items?: MenuItem[] 
                   {item.image && (
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-[#4A2C20]">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={mediaSrc(item.image)} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                   )}
                   <div className="flex-1">

@@ -35,7 +35,7 @@ export default function AdminNav({ name, role }: AdminNavProps) {
         {/* Logo + Brand */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <div className="w-8 h-8 rounded-full overflow-hidden border border-[#C59A4A]/30">
-            <Image src="/images/logo.webp" alt="La Cachette" width={32} height={32} className="object-cover" />
+            <Image src="/api/media/logo.webp" alt="La Cachette" width={32} height={32} className="object-cover" />
           </div>
           <div className="hidden sm:block">
             <p className="font-[family-name:var(--font-playfair)] text-[#C59A4A] text-sm tracking-widest leading-none">LA CACHETTE</p>

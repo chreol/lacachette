@@ -72,7 +72,7 @@ export default async function ReservationStatusPage({
         <div className="text-center">
           <Link href="/">
             <Image
-              src="/images/logo.webp"
+              src="/api/media/logo.webp"
               alt="La Cachette"
               width={64}
               height={64}
@@ -169,7 +169,7 @@ export default async function ReservationStatusPage({
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 text-sm border border-[#25D366]/30 bg-[#25D366]/10 text-[#25D366] rounded-xl py-2.5 hover:bg-[#25D366]/20 transition-colors"
               >
-                <Image src="/images/whatsapp-official.webp" alt="WA" width={16} height={16} />
+                <Image src="/api/media/whatsapp-official.webp" alt="WA" width={16} height={16} />
                 Contacter via WhatsApp
               </a>
             </div>

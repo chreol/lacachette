@@ -291,7 +291,7 @@ export default function ReservationsAdmin() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-sm bg-[#25D366] text-white px-4 py-2 rounded-xl font-medium hover:bg-[#20bd5a] transition-colors mt-1"
                         >
-                          <Image src="/images/whatsapp-official.webp" alt="WA" width={16} height={16} />
+                          <Image src="/api/media/whatsapp-official.webp" alt="WA" width={16} height={16} />
                           Contacter sur WhatsApp
                         </a>
                       )}

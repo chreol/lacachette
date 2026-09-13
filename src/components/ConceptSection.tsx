@@ -57,7 +57,7 @@ export default function ConceptSection() {
           >
             <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden border border-[#C59A4A]/30 shadow-[0_0_40px_rgba(197,154,74,0.15)] group">
               <Image
-                src="/images/terrasse.webp"
+                src="/api/media/terrasse.webp"
                 alt="La Cachette Terrasse"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
