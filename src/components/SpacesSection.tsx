@@ -38,21 +38,23 @@ export default function SpacesSection() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex flex-row overflow-x-auto md:flex-wrap md:justify-center gap-4 mb-16 pb-4 scrollbar-hide">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mb-16">
           {spaces.map((space) => {
             const isActive = activeTab === space.id;
             return (
               <button
                 key={space.id}
                 onClick={() => setActiveTab(space.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 px-3 py-3 rounded-full transition-all duration-300 min-h-[3.25rem] ${
                   isActive
                     ? "bg-[#C59A4A] text-[#171310] font-bold shadow-[0_0_15px_rgba(197,154,74,0.4)]"
                     : "bg-[#4A2C20] text-[#E8D8B8] hover:bg-[#5D3A2C]"
                 }`}
               >
-                {getIcon(space.icon)}
-                <span className="font-[family-name:var(--font-jakarta)] text-sm">{space.name}</span>
+                <span className="shrink-0">{getIcon(space.icon)}</span>
+                <span className="font-[family-name:var(--font-jakarta)] text-xs sm:text-sm leading-tight text-left">
+                  {space.name}
+                </span>
               </button>
             );
           })}

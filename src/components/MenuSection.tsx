@@ -96,8 +96,8 @@ export default function MenuSection({ items = menuItems }: { items?: MenuItem[] 
                   : "bg-[#4A2C20]/50 text-[#E8D8B8]/60 border-[#4A2C20] hover:bg-[#4A2C20] hover:text-[#E8D8B8] hover:border-[#C59A4A]/30"
               }`}
             >
-              <Icon size={16} />
-              <span className="hidden sm:inline">{cat.label}</span>
+              <Icon size={16} className="shrink-0" />
+              <span>{cat.label}</span>
             </button>
           );
         })}
