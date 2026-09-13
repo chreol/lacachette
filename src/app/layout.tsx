@@ -95,7 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="fr"
-      className={`${playfair.variable} ${jakarta.variable} h-full antialiased`}
+      className={`${playfair.variable} ${jakarta.variable} min-h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black-ebony text-ivory-cream">
         {children}

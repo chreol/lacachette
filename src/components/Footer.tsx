@@ -4,7 +4,7 @@ import FlagCounter from '@/components/FlagCounter';
 import { SITE_URL } from '@/lib/site';
 import { buildRestaurantWhatsAppLink } from '@/lib/whatsapp';
 import { DELIVERY_WHATSAPP_MESSAGE } from '@/lib/restaurant-location';
-import { getSiteContent, mapsUrlFromContent } from '@/lib/site-content';
+import { getSiteContent, mapsEmbedUrlFromContent, mapsUrlFromContent } from '@/lib/site-content';
 
 const socialBtn =
   "w-10 h-10 rounded-full bg-[#171310] border border-[#4A2C20] flex items-center justify-center text-[#C59A4A] hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300";
@@ -12,6 +12,7 @@ const socialBtn =
 export default async function Footer() {
   const site = await getSiteContent();
   const mapsUrl = mapsUrlFromContent(site);
+  const mapsEmbed = mapsEmbedUrlFromContent(site);
   const wa = `https://wa.me/${site.phone.replace(/[^\d]/g, "")}`;
   const waDelivery = buildRestaurantWhatsAppLink(DELIVERY_WHATSAPP_MESSAGE);
   const tel = site.phone.startsWith("+") ? site.phone : `+${site.phone.replace(/[^\d]/g, "")}`;
@@ -46,7 +47,7 @@ export default async function Footer() {
             <p className="text-[#E8D8B8]/70 leading-relaxed max-w-sm">
               {site.blurb}
             </p>
-            <div className="flex items-center space-x-4 pt-4">
+            <div className="flex flex-wrap items-center gap-3 pt-4">
               {site.instagramUrl ? (
                 <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Instagram">
                   <Globe className="w-5 h-5" />
@@ -62,9 +63,6 @@ export default async function Footer() {
                   <Music2 className="w-5 h-5" />
                 </a>
               ) : null}
-              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Google Maps">
-                <MapPin className="w-5 h-5" />
-              </a>
               {site.googleReviewUrl ? (
                 <a href={site.googleReviewUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Avis Google">
                   <Star className="w-5 h-5" />
@@ -196,6 +194,52 @@ export default async function Footer() {
           </div>
 
         </div>
+
+        <div className="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+          <div className="rounded-2xl overflow-hidden border border-[#4A2C20] min-h-[260px] bg-[#171310]">
+            <iframe
+              title="La Cachette sur Google Maps"
+              src={mapsEmbed}
+              className="w-full h-[280px] lg:h-full min-h-[260px] border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+          <div className="rounded-2xl border border-[#4A2C20] bg-[#171310] p-6 md:p-8 flex flex-col justify-center gap-5">
+            <h3 className="text-xl font-[family-name:var(--font-playfair)] text-[#C59A4A]">
+              Nous trouver
+            </h3>
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 text-sm hover:text-[#C59A4A] transition-colors">
+              <MapPin className="w-5 h-5 text-[#C59A4A] shrink-0 mt-0.5" />
+              <span>
+                Sis à {site.addressStreet} – Yaoundé IV, Cameroun
+                <br />
+                <span className="text-[#C59A4A]/80 text-xs">Ouvrir dans Google Maps</span>
+              </span>
+            </a>
+            <a href={`tel:${tel}`} className="flex items-center gap-3 text-sm hover:text-[#C59A4A] transition-colors">
+              <span className="text-lg w-5 text-center">📞</span>
+              {tel.replace("+237", "(237)")}
+            </a>
+            <a href={wa} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm hover:text-[#25D366] transition-colors">
+              <Image src="/images/whatsapp-official.webp" alt="" width={20} height={20} className="shrink-0" />
+              WhatsApp {tel}
+            </a>
+            <a href={`mailto:${site.email}`} className="flex items-center gap-3 text-sm hover:text-[#C59A4A] transition-colors">
+              <span className="text-lg w-5 text-center">📧</span>
+              {site.email}
+            </a>
+            {site.emailAlt ? (
+              <a href={`mailto:${site.emailAlt}`} className="flex items-center gap-3 text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors pl-8">
+                {site.emailAlt}
+              </a>
+            ) : null}
+            <div className="pt-4 border-t border-[#4A2C20]/50">
+              <FlagCounter />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Chreol Empire Brand */}
@@ -221,11 +265,10 @@ export default async function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-[#4A2C20]/50 bg-[#0A0807]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-[#E8D8B8]/60 text-sm text-center md:text-left">
             © 2026 La Cachette. Tous droits réservés. <span className="hidden md:inline">|</span> Fait avec ♥ à Yaoundé
           </p>
-          <FlagCounter />
           <p className="text-[#E8D8B8]/30 text-xs">
             Powered by <a href="https://chreolempire.com" target="_blank" rel="noopener noreferrer" className="text-[#C59A4A]/50 hover:text-[#C59A4A] transition-colors">Chreol Empire</a>
           </p>

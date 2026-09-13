@@ -21,5 +21,6 @@ export const SITE_GEO = {
   latitude: RESTAURANT_LOCATION.lat,
   longitude: RESTAURANT_LOCATION.lng,
 };
-export const SITE_MAPS_URL = "https://maps.app.goo.gl/qJYFWab2BePrqKGZ8";
+export const SITE_MAPS_URL =
+  "https://www.google.com/maps/place//data=!4m2!3m1!1s0x108bc53a001691d1:0x55daf1a8e7749cd9";
 export const SITE_OG_IMAGE = `${SITE_URL}/images/entree.webp`;

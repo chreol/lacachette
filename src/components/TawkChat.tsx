@@ -1,6 +1,12 @@
+"use client";
+
 import Script from "next/script";
+import { usePathname } from "next/navigation";
 
 export default function TawkChat() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <Script id="tawk-to" strategy="lazyOnload">
       {`

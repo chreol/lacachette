@@ -71,7 +71,8 @@ function mergeContent(raw: unknown): SiteContent {
   const placeholderMaps =
     !incoming.googleMapsUrl ||
     incoming.googleMapsUrl.includes("Dernier+Poteau") ||
-    incoming.googleMapsUrl.includes("Eki%C3%A9");
+    incoming.googleMapsUrl.includes("Eki%C3%A9") ||
+    incoming.googleMapsUrl.includes("maps.app.goo.gl");
   const placeholderGeo =
     !incoming.geoLat ||
     incoming.geoLat === "3.848" ||
@@ -118,6 +119,12 @@ export async function saveSiteContent(payload: SiteContent): Promise<SiteContent
   );
   cache = { at: Date.now(), value };
   return value;
+}
+
+export function mapsEmbedUrlFromContent(site: SiteContent) {
+  const lat = site.geoLat.trim() || String(SITE_GEO.latitude);
+  const lng = site.geoLng.trim() || String(SITE_GEO.longitude);
+  return `https://maps.google.com/maps?q=${encodeURIComponent(`${lat},${lng}`)}&z=16&hl=fr&output=embed`;
 }
 
 export function mapsUrlFromContent(site: SiteContent) {

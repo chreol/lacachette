@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { X, Send } from "lucide-react";
 import { buildRestaurantWhatsAppLink } from "@/lib/whatsapp";
@@ -9,12 +10,14 @@ const DEFAULT_MESSAGE =
   "Bonjour *La Cachette* 🙂, je souhaite avoir des informations sur : ";
 
 export default function WhatsAppButton() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
-  // Avoid SSR/client hydration mismatch — render nothing server-side
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
-  if (!mounted) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  if (!mounted || pathname.startsWith("/admin")) return null;
 
   const handleSend = () => {
     const link = buildRestaurantWhatsAppLink(message);
