@@ -87,9 +87,9 @@ export default function SiteAdmin() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-[#C59A4A] font-semibold">Localisation (à préciser sur le terrain)</h2>
+        <h2 className="text-[#C59A4A] font-semibold">Localisation</h2>
         <p className="text-xs text-[#E8D8B8]/40">
-          Pour l’instant le lien Maps pointe sur « Ékié, Dernier Poteau ». Quand tu auras les GPS, remplis latitude / longitude ou colle le lien Google Maps.
+          Lien Google Maps officiel. Les coordonnées GPS sont déjà renseignées (Ékié).
         </p>
         <input className={inputClass} value={site.googleMapsUrl} onChange={(e) => setSite({ ...site, googleMapsUrl: e.target.value })} placeholder="Lien Google Maps" />
         <input className={inputClass} value={site.googleReviewUrl} onChange={(e) => setSite({ ...site, googleReviewUrl: e.target.value })} placeholder="Lien avis Google (fiche Business)" />

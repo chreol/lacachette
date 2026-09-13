@@ -8,13 +8,13 @@ import { spaces } from "@/types/restaurant";
 
 const getIcon = (name: string) => {
   switch (name) {
-    case "DoorOpen": return <DoorOpen className="w-5 h-5" />;
-    case "TreePalm": return <TreePalm className="w-5 h-5" />;
-    case "Wine": return <Wine className="w-5 h-5" />;
-    case "Crown": return <Crown className="w-5 h-5" />;
-    case "ChefHat": return <ChefHat className="w-5 h-5" />;
-    case "Sparkles": return <Sparkles className="w-5 h-5" />;
-    default: return <Sparkles className="w-5 h-5" />;
+    case "DoorOpen": return <DoorOpen className="w-5 h-5 shrink-0" />;
+    case "TreePalm": return <TreePalm className="w-5 h-5 shrink-0" />;
+    case "Wine": return <Wine className="w-5 h-5 shrink-0" />;
+    case "Crown": return <Crown className="w-5 h-5 shrink-0" />;
+    case "ChefHat": return <ChefHat className="w-5 h-5 shrink-0" />;
+    case "Sparkles": return <Sparkles className="w-5 h-5 shrink-0" />;
+    default: return <Sparkles className="w-5 h-5 shrink-0" />;
   }
 };
 
@@ -51,7 +51,7 @@ export default function SpacesSection() {
                     : "bg-[#4A2C20] text-[#E8D8B8] hover:bg-[#5D3A2C]"
                 }`}
               >
-                <span className="shrink-0">{getIcon(space.icon)}</span>
+                {getIcon(space.icon)}
                 <span className="font-[family-name:var(--font-jakarta)] text-xs sm:text-sm leading-tight text-left">
                   {space.name}
                 </span>

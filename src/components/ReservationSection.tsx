@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { User, Mail, Calendar, Clock, Users, MapPin, MessageSquare, Send, Loader2, Check, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import { liveEvents as fallbackEvents, ReservationForm, type LiveEvent } from '@/types/restaurant';
-import { isClosedDate } from '@/lib/opening-hours';
+import { addDaysYmd, isClosedDate, weekdayFromYmd, ymdInYaounde } from '@/lib/opening-hours';
 
 interface SlotAvailability {
   time: string;
@@ -36,33 +36,28 @@ const SPACE_MAX_GUESTS: Record<string, number> = {
 const inputClassName = "w-full bg-[#171310] border border-[#4A2C20] rounded-lg px-4 py-3 pl-11 text-[#E8D8B8] focus:border-[#C59A4A] focus:ring-1 focus:ring-[#C59A4A] transition-all duration-300 placeholder:text-[#E8D8B8]/30 outline-none";
 const iconClassName = "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#C59A4A]";
 
-function generateDateOptions(extraDate?: string): Date[] {
-  const days = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date();
-    d.setHours(12, 0, 0, 0);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
+const QUICK_DATE_DAYS = 14;
+const MAX_BOOKING_DAYS = 90;
+
+function generateDateOptions(extraDate?: string): string[] {
+  const today = ymdInYaounde();
+  const days = Array.from({ length: QUICK_DATE_DAYS }, (_, i) => addDaysYmd(today, i));
   if (extraDate && /^\d{4}-\d{2}-\d{2}$/.test(extraDate)) {
-    const exists = days.some((d) => formatDateValue(d) === extraDate);
-    if (!exists) {
-      const extra = new Date(`${extraDate}T12:00:00`);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (extra >= today) {
-        days.push(extra);
-        days.sort((a, b) => a.getTime() - b.getTime());
-      }
+    const lastQuick = addDaysYmd(today, QUICK_DATE_DAYS - 1);
+    const maxDate = addDaysYmd(today, MAX_BOOKING_DAYS);
+    if (extraDate > lastQuick && extraDate <= maxDate && extraDate >= today && !days.includes(extraDate)) {
+      days.push(extraDate);
     }
   }
   return days;
 }
 
-function formatDateValue(d: Date): string {
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+function dayNumber(ymd: string): number {
+  return Number(ymd.slice(8, 10));
+}
+
+function monthIndex(ymd: string): number {
+  return Number(ymd.slice(5, 7)) - 1;
 }
 
 export default function ReservationSection({ events = fallbackEvents }: { events?: LiveEvent[] }) {
@@ -94,7 +89,7 @@ export default function ReservationSection({ events = fallbackEvents }: { events
   // Clé de rafraîchissement : s'incrémente après chaque réservation pour forcer le re-fetch des créneaux
   const [slotRefreshKey, setSlotRefreshKey] = useState(0);
 
-  const dates = generateDateOptions(selectedEvent?.date);
+  const dates = generateDateOptions(formState.date || selectedEvent?.date);
   const eventPrefillDone = useRef(false);
 
   useEffect(() => {
@@ -363,10 +358,10 @@ export default function ReservationSection({ events = fallbackEvents }: { events
                     className="flex gap-2 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden"
                     style={{ scrollbarWidth: 'none' }}
                   >
-                    {dates.map((d, i) => {
-                      const dateValue = formatDateValue(d);
+                    {dates.map((dateValue) => {
                       const isSelected = formState.date === dateValue;
                       const closed = isClosedDate(dateValue);
+                      const todayYmd = ymdInYaounde();
 
                       return (
                         <button
@@ -383,17 +378,39 @@ export default function ReservationSection({ events = fallbackEvents }: { events
                           }`}
                         >
                           <span className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isSelected && !closed ? 'text-[#171310]/70' : 'text-[#E8D8B8]/50'}`}>
-                            {i === 0 ? 'Auj.' : DAYS_FR[d.getDay()]}
+                            {dateValue === todayYmd ? 'Auj.' : DAYS_FR[weekdayFromYmd(dateValue)]}
                           </span>
                           <span className="text-xl font-[family-name:var(--font-playfair)] font-bold leading-none">
-                            {d.getDate()}
+                            {dayNumber(dateValue)}
                           </span>
                           <span className={`text-[10px] mt-0.5 ${isSelected && !closed ? 'text-[#171310]/70' : 'text-[#E8D8B8]/50'}`}>
-                            {closed ? 'Fermé' : MONTHS_FR[d.getMonth()]}
+                            {closed ? 'Fermé' : MONTHS_FR[monthIndex(dateValue)]}
                           </span>
                         </button>
                       );
                     })}
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <label className="text-xs text-[#E8D8B8]/50">
+                      Plus tard (jusqu&apos;à {MAX_BOOKING_DAYS} jours) :
+                    </label>
+                    <input
+                      type="date"
+                      min={ymdInYaounde()}
+                      max={addDaysYmd(ymdInYaounde(), MAX_BOOKING_DAYS)}
+                      value={formState.date}
+                      onChange={(e) => {
+                        const next = e.target.value;
+                        if (!next) return;
+                        if (isClosedDate(next)) {
+                          setError('Le restaurant est fermé ce jour-là. Choisissez une autre date.');
+                          return;
+                        }
+                        setError(null);
+                        handleDateSelect(next);
+                      }}
+                      className="bg-[#171310] border border-[#4A2C20] rounded-lg px-3 py-2 text-sm text-[#E8D8B8] outline-none focus:border-[#C59A4A] [color-scheme:dark]"
+                    />
                   </div>
                 </div>
 

@@ -23,6 +23,15 @@ export function ymdInYaounde(date = new Date()): string {
   return date.toLocaleDateString("en-CA", { timeZone: TIMEZONE });
 }
 
+export function addDaysYmd(ymd: string, days: number): string {
+  const [year, month, day] = ymd.split("-").map(Number);
+  const dt = new Date(Date.UTC(year, month - 1, day + days));
+  const y = dt.getUTCFullYear();
+  const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dt.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export function weekdayFromYmd(ymd: string): number {
   return new Date(`${ymd}T12:00:00+01:00`).getUTCDay();
 }

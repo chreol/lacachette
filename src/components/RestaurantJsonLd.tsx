@@ -3,6 +3,7 @@ import {
   SITE_DESCRIPTION,
   SITE_EMAIL,
   SITE_GEO,
+  SITE_MAPS_URL,
   SITE_NAME,
   SITE_OG_IMAGE,
   SITE_PHONE,
@@ -59,7 +60,7 @@ export function RestaurantJsonLd({
       latitude: geo?.lat ?? SITE_GEO.latitude,
       longitude: geo?.lng ?? SITE_GEO.longitude,
     },
-    hasMap: mapsUrl ?? "https://maps.google.com/?q=%C3%89ki%C3%A9+Dernier+Poteau+Yaound%C3%A9",
+    hasMap: mapsUrl ?? SITE_MAPS_URL,
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",

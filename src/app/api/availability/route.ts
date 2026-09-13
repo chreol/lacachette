@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { ymdInYaounde } from '@/lib/opening-hours';
 import { getAvailableSlots, getDateAvailability, ZONE_CONFIG } from '@/lib/availability';
 
 export async function GET(request: Request) {
@@ -15,16 +16,11 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Invalid or missing space' }, { status: 400 });
     }
 
-    // Validate date is not in the past
-    const selectedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (isNaN(selectedDate.getTime())) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T12:00:00Z`))) {
       return NextResponse.json({ error: 'Invalid date format' }, { status: 400 });
     }
 
-    if (selectedDate < today) {
+    if (date < ymdInYaounde()) {
       return NextResponse.json({ error: 'Date cannot be in the past' }, { status: 400 });
     }
 

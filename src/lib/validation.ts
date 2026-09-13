@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isClosedDate } from "@/lib/opening-hours";
+import { addDaysYmd, isClosedDate, ymdInYaounde } from "@/lib/opening-hours";
 
 export const spaceChoiceValues = ["terrasse", "salle", "vip", "privatisation-vip"] as const;
 
@@ -20,13 +20,18 @@ export const reservationInputSchema = z.object({
   message: z.string().trim().max(1000).optional(),
 }).superRefine((data, ctx) => {
   // Validate that the date is not in the past
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const inputDate = new Date(data.date);
-  if (inputDate < today) {
+  const today = ymdInYaounde();
+  if (data.date < today) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "La date ne peut pas être dans le passé",
+      path: ["date"],
+    });
+  }
+  if (data.date > addDaysYmd(today, 90)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Les réservations sont ouvertes jusqu'à 90 jours",
       path: ["date"],
     });
   }

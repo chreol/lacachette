@@ -16,7 +16,8 @@ export const SITE_ADDRESS = {
   country: "CM",
 };
 export const SITE_GEO = {
-  latitude: 3.848,
-  longitude: 11.5021,
+  latitude: 3.831866,
+  longitude: 11.540261,
 };
+export const SITE_MAPS_URL = "https://maps.app.goo.gl/qJYFWab2BePrqKGZ8";
 export const SITE_OG_IMAGE = `${SITE_URL}/images/entree.webp`;

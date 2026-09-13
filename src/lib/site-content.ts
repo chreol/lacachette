@@ -4,6 +4,7 @@ import {
   SITE_DESCRIPTION,
   SITE_EMAIL,
   SITE_GEO,
+  SITE_MAPS_URL,
   SITE_NAME,
   SITE_PHONE,
   SITE_URL,
@@ -43,7 +44,7 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
   instagramUrl: "",
   facebookUrl: "",
   tiktokUrl: "",
-  googleMapsUrl: "https://maps.google.com/?q=%C3%89ki%C3%A9+Dernier+Poteau+Yaound%C3%A9",
+  googleMapsUrl: SITE_MAPS_URL,
   googleReviewUrl: "",
   geoLat: String(SITE_GEO.latitude),
   geoLng: String(SITE_GEO.longitude),
@@ -67,9 +68,24 @@ function normalizeWeek(raw: unknown): Record<number, DayHours> {
 function mergeContent(raw: unknown): SiteContent {
   if (!raw || typeof raw !== "object") return DEFAULT_SITE_CONTENT;
   const incoming = raw as Partial<SiteContent>;
+  const placeholderMaps =
+    !incoming.googleMapsUrl ||
+    incoming.googleMapsUrl.includes("Dernier+Poteau") ||
+    incoming.googleMapsUrl.includes("Eki%C3%A9");
+  const placeholderGeo =
+    !incoming.geoLat ||
+    incoming.geoLat === "3.848" ||
+    incoming.geoLat === String(3.848);
   return {
     ...DEFAULT_SITE_CONTENT,
     ...incoming,
+    googleMapsUrl: placeholderMaps
+      ? DEFAULT_SITE_CONTENT.googleMapsUrl
+      : (incoming.googleMapsUrl ?? DEFAULT_SITE_CONTENT.googleMapsUrl),
+    geoLat: placeholderGeo
+      ? DEFAULT_SITE_CONTENT.geoLat
+      : (incoming.geoLat ?? DEFAULT_SITE_CONTENT.geoLat),
+    geoLng: placeholderGeo ? DEFAULT_SITE_CONTENT.geoLng : incoming.geoLng ?? DEFAULT_SITE_CONTENT.geoLng,
     hoursLabels: incoming.hoursLabels?.length ? incoming.hoursLabels : DEFAULT_SITE_CONTENT.hoursLabels,
     weekHours: normalizeWeek(incoming.weekHours ?? DEFAULT_WEEK_HOURS),
   };
@@ -103,17 +119,13 @@ export async function saveSiteContent(payload: SiteContent): Promise<SiteContent
 }
 
 export function mapsUrlFromContent(site: SiteContent) {
+  if (site.googleMapsUrl.trim()) return site.googleMapsUrl.trim();
   const lat = site.geoLat.trim();
   const lng = site.geoLng.trim();
-  const hasFieldGps =
-    lat &&
-    lng &&
-    (lat !== String(SITE_GEO.latitude) || lng !== String(SITE_GEO.longitude));
-  if (hasFieldGps) {
+  if (lat && lng) {
     return `https://maps.google.com/?q=${encodeURIComponent(`${lat},${lng}`)}`;
   }
-  if (site.googleMapsUrl.trim()) return site.googleMapsUrl.trim();
-  return `https://maps.google.com/?q=${encodeURIComponent(`${site.addressStreet}, Yaoundé`)}`;
+  return SITE_MAPS_URL;
 }
 
 export function napSameAs(site: SiteContent) {
