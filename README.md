@@ -95,7 +95,7 @@ Crée un fichier `.env.local` à la racine :
 
 ```env
 # Base de données Supabase
-DATABASE_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
+DATABASE_URL="postgresql://postgres.PROJECT:PASSWORD@aws-1-eu-west-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres"
 
 # Sessions admin (générer : openssl rand -base64 32)
@@ -157,7 +157,7 @@ npm run dev
 ### Variables d'environnement à configurer
 Dans **Vercel → Project Settings → Environment Variables**, ajouter toutes les variables du `.env.local` avec les valeurs de production.
 
-> ⚠️ **Important** : `DATABASE_URL` doit utiliser le **port 5432** (connexion directe) sur Vercel — le port 6543 (pgbouncer) est bloqué depuis AWS us-east-1.
+> ⚠️ **Important** : sur Vercel, `DATABASE_URL` doit pointer vers le **pooler IPv4** (`aws-1-eu-west-1.pooler.supabase.com:6543`), pas `db.*.supabase.co` (IPv6, injoignable depuis Vercel). `DIRECT_URL` reste la connexion directe (migrations).
 
 ### Cron Job (rappels J-1)
 Le fichier `vercel.json` configure un cron quotidien à **10h00 Yaoundé (7h UTC)** :
