@@ -5,11 +5,11 @@ import { Menu, X } from "lucide-react";
 import Image from "next/image";
 
 const navLinks = [
-  { label: "Le Concept", href: "#concept" },
-  { label: "Nos Espaces", href: "#spaces" },
-  { label: "La Carte", href: "#menu" },
-  { label: "Événements", href: "#events" },
-  { label: "Contact", href: "#contact" },
+  { label: "Le Concept", href: "/#concept" },
+  { label: "Nos Espaces", href: "/#spaces" },
+  { label: "La Carte", href: "/carte" },
+  { label: "Événements", href: "/soirees" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Navbar() {
@@ -44,7 +44,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 md:px-10 py-2 flex items-center justify-between">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-3 group shrink-0">
+          <a href="/" className="flex items-center gap-3 group shrink-0">
             <Image
               src="/images/logo.webp"
               alt="LA CACHETTE"
@@ -76,7 +76,7 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#reservation"
+              href="/reserver"
               className="ml-4 px-6 py-2.5 bg-[#C59A4A] text-[#171310] text-sm font-bold rounded-lg hover:bg-[#B86B32] transition-all duration-300 hover:shadow-lg hover:shadow-[#C59A4A]/20"
             >
               Réserver une table
@@ -115,7 +115,7 @@ export default function Navbar() {
             </a>
           ))}
           <a
-            href="#reservation"
+            href="/reserver"
             onClick={handleLinkClick}
             className="mt-4 px-10 py-4 bg-[#C59A4A] text-[#171310] text-lg font-bold rounded-xl hover:bg-[#B86B32] transition-all duration-300"
           >

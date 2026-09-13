@@ -1,11 +1,20 @@
 'use client';
 
 import { useRef } from 'react';
+import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
 import { Music, Clock } from 'lucide-react';
-import { liveEvents } from '@/types/restaurant';
+import { liveEvents as fallbackEvents, type LiveEvent } from '@/types/restaurant';
 
-export default function EventsSection() {
+function eventDay(date: string) {
+  const d = new Date(`${date}T12:00:00`);
+  return {
+    day: d.getDate(),
+    month: d.toLocaleString('fr-FR', { month: 'short' }),
+  };
+}
+
+export default function EventsSection({ events = fallbackEvents }: { events?: LiveEvent[] }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -43,21 +52,34 @@ export default function EventsSection() {
           animate={isInView ? "visible" : "hidden"}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {liveEvents.map((event) => (
+          {events.map((event) => (
             <motion.div
               key={event.id}
               variants={itemVariants}
               className="bg-[#4A2C20] rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform duration-300 flex flex-col group relative"
             >
               {/* Top section: Gradient placeholder */}
-              <div className="h-48 bg-gradient-to-br from-[#171310] to-[#9A4F32] flex flex-col items-center justify-center relative p-6">
-                <Music className="w-12 h-12 text-[#C59A4A] mb-2 opacity-80" />
-                <span className="text-[#E8D8B8] font-medium tracking-wide uppercase">{event.genre}</span>
+              <div className="h-48 bg-gradient-to-br from-[#171310] to-[#9A4F32] flex flex-col items-center justify-center relative p-6 overflow-hidden">
+                {event.image ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={event.image} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-[#171310]/45" />
+                    <span className="relative z-10 text-[#E8D8B8] font-medium tracking-wide uppercase drop-shadow-lg">
+                      {event.genre}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Music className="w-12 h-12 text-[#C59A4A] mb-2 opacity-80" />
+                    <span className="text-[#E8D8B8] font-medium tracking-wide uppercase">{event.genre}</span>
+                  </>
+                )}
                 {/* Date badge */}
-                <div className="absolute top-4 right-4 bg-[#C59A4A] text-[#171310] rounded-lg px-3 py-2 text-center shadow-lg">
-                  <span className="block font-bold text-lg leading-none">{new Date(event.date).getDate()}</span>
+                <div className="absolute top-4 right-4 z-20 bg-[#C59A4A] text-[#171310] rounded-lg px-3 py-2 text-center shadow-lg">
+                  <span className="block font-bold text-lg leading-none">{eventDay(event.date).day}</span>
                   <span className="block text-xs uppercase font-medium mt-1">
-                    {new Date(event.date).toLocaleString('default', { month: 'short' })}
+                    {eventDay(event.date).month}
                   </span>
                 </div>
               </div>
@@ -79,9 +101,12 @@ export default function EventsSection() {
                 </p>
 
                 {/* Bottom */}
-                <button className="w-full py-3 border border-[#C59A4A] text-[#C59A4A] rounded-lg font-medium hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300">
+                <Link
+                  href={`/reserver?event=${event.id}`}
+                  className="w-full py-3 border border-[#C59A4A] text-[#C59A4A] rounded-lg font-medium hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300 text-center"
+                >
                   Pré-réserver
-                </button>
+                </Link>
               </div>
             </motion.div>
           ))}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, Users, LogOut, ExternalLink } from "lucide-react";
+import { CalendarDays, Users, LogOut, ExternalLink, UtensilsCrossed, Music, ImageIcon, Settings } from "lucide-react";
 
 interface AdminNavProps {
   name: string;
@@ -22,6 +22,10 @@ export default function AdminNav({ name, role }: AdminNavProps) {
 
   const navItems = [
     { href: "/admin", label: "Réservations", icon: CalendarDays },
+    { href: "/admin/carte", label: "Carte", icon: UtensilsCrossed },
+    { href: "/admin/soirees", label: "Soirées", icon: Music },
+    { href: "/admin/medias", label: "Images", icon: ImageIcon },
+    { href: "/admin/site", label: "Site", icon: Settings },
     ...(role === "ADMIN" ? [{ href: "/admin/users", label: "Personnel", icon: Users }] : []),
   ];
 
@@ -40,7 +44,7 @@ export default function AdminNav({ name, role }: AdminNavProps) {
         </div>
 
         {/* Navigation tabs */}
-        <nav className="flex items-center gap-1 bg-[#1a1614] border border-[#4A2C20]/40 rounded-xl p-1">
+        <nav className="flex items-center gap-1 bg-[#1a1614] border border-[#4A2C20]/40 rounded-xl p-1 overflow-x-auto max-w-[55%] sm:max-w-none">
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (

@@ -21,6 +21,7 @@ export interface ClientConfirmationData {
   space: string;
   message?: string;
   status: string;
+  whatsappUrl?: string;
 }
 
 export interface StatusUpdateData {
@@ -75,7 +76,7 @@ function emailLayout(content: string, preheader?: string): string {
                 <a href="https://t.me/LacachetteResto_Bot" style="color: #229ED9; text-decoration: none;">Telegram</a>
               </p>
               <p style="margin: 0 0 4px; color: #666; font-size: 11px;">
-                <a href="mailto:restolacachatte@chreolempire.com" style="color: #666; text-decoration: none;">restolacachatte@chreolempire.com</a>
+                <a href="mailto:restolacachette@chreolempire.com" style="color: #666; text-decoration: none;">restolacachette@chreolempire.com</a>
                 &nbsp;&middot;&nbsp;
                 <a href="mailto:lacachette@resto.chreolempire.com" style="color: #666; text-decoration: none;">lacachette@resto.chreolempire.com</a>
               </p>
@@ -271,10 +272,14 @@ export function buildReservationConfirmationClientEmail(data: ClientConfirmation
       </tr>
     </table>
     
-    <p style="margin: 0; font-size: 14px; line-height: 1.7; color: #aaa;">
-      Merci de votre confiance, <strong style="color: #C59A4A;">${escapeHtml(data.name)}</strong>. 
+    <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.7; color: #aaa;">
+      Merci de votre confiance, <strong style="color: #C59A4A;">${escapeHtml(data.name)}</strong>.
       Nous avons h&acirc;te de vous accueillir chez La Cachette !&nbsp;&#127870;
     </p>
+    ${data.whatsappUrl ? `
+    <p style="margin: 0; text-align: center;">
+      <a href="${escapeHtml(data.whatsappUrl)}" style="display: inline-block; background-color: #25D366; color: #171310; text-decoration: none; font-weight: bold; padding: 12px 22px; border-radius: 8px;">Confirmer sur WhatsApp</a>
+    </p>` : ''}
   `;
 
   return emailLayout(content, `Votre demande de réservation à La Cachette pour le ${data.date}`);

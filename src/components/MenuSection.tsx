@@ -46,10 +46,10 @@ function getBadgeIcon(badge: MenuItem["badge"]) {
   }
 }
 
-export default function MenuSection() {
+export default function MenuSection({ items = menuItems }: { items?: MenuItem[] }) {
   const [activeCategory, setActiveCategory] = useState<MenuCategory>("grillades");
 
-  const filteredItems = menuItems.filter((item) => item.category === activeCategory);
+  const filteredItems = items.filter((item) => item.category === activeCategory);
 
   return (
     <section id="menu" className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
@@ -124,6 +124,12 @@ export default function MenuSection() {
                 className="group bg-[#4A2C20]/60 backdrop-blur-sm rounded-xl p-6 border border-[#4A2C20] hover:border-[#C59A4A]/30 hover:bg-[#5D3A2C]/60 transition-all duration-300"
               >
                 <div className="flex justify-between items-start gap-4">
+                  {item.image && (
+                    <div className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-[#4A2C20]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    </div>
+                  )}
                   <div className="flex-1">
                     {/* Name + Badges */}
                     <div className="flex items-center gap-3 mb-2 flex-wrap">

@@ -224,7 +224,7 @@ prisma/
 
 | | |
 |---|---|
-| 📧 Email | restolacachatte@chreolempire.com |
+| 📧 Email | restolacachette@chreolempire.com |
 | 📧 Email alt | lacachette@resto.chreolempire.com |
 | 📱 WhatsApp | +237 693 547 268 |
 | 🤖 Telegram Bot | @LacachetteResto_Bot |

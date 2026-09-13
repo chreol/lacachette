@@ -1,5 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { toPrismaSpaceChoice } from '@/lib/reservation-mapping';
+import {
+  clockToMinutes,
+  isClosedDate,
+  nowMinutesInYaounde,
+  slotsForDateAndSpace,
+  ymdInYaounde,
+} from '@/lib/opening-hours';
+import { getSiteContent } from '@/lib/site-content';
 
 export interface ZoneConfig {
   capacity: number;
@@ -43,19 +51,24 @@ export function generateSlots(startTime: string, endTime: string, intervalMinute
 }
 
 export const ZONE_CONFIG: Record<string, ZoneConfig> = {
-  terrasse:           { capacity: 15, slots: generateSlots('11:00', '23:00', 30), label: 'Terrasse' },
-  salle:              { capacity: 20, slots: generateSlots('11:00', '23:00', 30), label: 'Salle Principale' },
-  vip:                { capacity: 4,  slots: generateSlots('18:00', '00:00', 30), label: 'VIP Lounge' },
-  'privatisation-vip':{ capacity: 2,  slots: generateSlots('18:00', '00:00', 30), label: 'Privatisation VIP', exclusive: true },
+  terrasse:           { capacity: 15, slots: [], label: 'Terrasse' },
+  salle:              { capacity: 20, slots: [], label: 'Salle Principale' },
+  vip:                { capacity: 4,  slots: [], label: 'VIP Lounge' },
+  'privatisation-vip':{ capacity: 2,  slots: [], label: 'Privatisation VIP', exclusive: true },
 };
 
 export async function getAvailableSlots(date: string, space: string): Promise<SlotAvailability[]> {
   const config = ZONE_CONFIG[space];
   if (!config) throw new Error(`Invalid space: ${space}`);
 
+  const site = await getSiteContent();
+  if (isClosedDate(date, site.weekHours)) {
+    return [];
+  }
+
+  const daySlots = slotsForDateAndSpace(date, space, site.weekHours);
   const prismaSpace = toPrismaSpaceChoice(space);
   
-  // Get all active reservations for this date and space
   const reservations = await prisma.reservation.findMany({
     where: {
       date: date,
@@ -66,22 +79,18 @@ export async function getAvailableSlots(date: string, space: string): Promise<Sl
     }
   });
 
-  // Determine if the requested date is today (to filter past time slots)
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = ymdInYaounde();
   const isToday = date === todayStr;
-  const nowMinutes = isToday
-    ? new Date().getHours() * 60 + new Date().getMinutes()
-    : -1;
+  let nowMinutes = isToday ? nowMinutesInYaounde() : -1;
+  if (isToday && nowMinutes < 6 * 60) nowMinutes += 24 * 60;
 
   const slotsAvailability: SlotAvailability[] = [];
-
-  // For 'privatisation-vip', any existing reservation makes ALL slots 'full'
   const isPrivatisationVIPAllFull = space === 'privatisation-vip' && reservations.length > 0;
 
-  for (const slotTime of config.slots) {
-    const slotMins = timeToMinutes(slotTime);
+  for (const slotTime of daySlots) {
+    let slotMins = clockToMinutes(slotTime, false);
+    if (slotMins < 6 * 60) slotMins += 24 * 60;
 
-    // Skip slots that have already passed today (need at least 30 min of notice)
     if (isToday && slotMins <= nowMinutes) {
       continue;
     }
@@ -94,6 +103,7 @@ export async function getAvailableSlots(date: string, space: string): Promise<Sl
       let resMins = 0;
       const [h, m] = res.time.split(':').map(Number);
       resMins = h * 60 + m;
+      if (resMins < 6 * 60) resMins += 24 * 60;
       
       const resEndMins = resMins + RESERVATION_DURATION_MINUTES;
 
@@ -138,7 +148,10 @@ export async function isSlotAvailable(date: string, time: string, space: string,
   return targetSlot.remainingCapacity >= guests;
 }
 
-export async function getDateAvailability(date: string, space: string): Promise<'available' | 'limited' | 'full'> {
+export async function getDateAvailability(date: string, space: string): Promise<'available' | 'limited' | 'full' | 'closed'> {
+  const site = await getSiteContent();
+  if (isClosedDate(date, site.weekHours)) return 'closed';
+
   const slots = await getAvailableSlots(date, space);
   
   if (slots.length === 0) return 'full';

@@ -135,7 +135,7 @@ export default function StorySection() {
             Et l&apos;histoire continue, à chaque réservation, à chaque soirée partagée.
           </p>
           <a
-            href="#reservation"
+            href="/reserver"
             className="inline-block px-8 py-3.5 bg-transparent border-2 border-[#C59A4A] text-[#C59A4A] font-bold text-sm uppercase tracking-wider rounded-lg hover:bg-[#C59A4A] hover:text-[#171310] transition-all duration-300"
           >
             Écrire votre chapitre

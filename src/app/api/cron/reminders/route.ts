@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { fromPrismaSpaceChoice, spaceLabels } from "@/lib/reservation-mapping";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { SITE_URL } from "@/lib/site";
 
 export async function GET(request: NextRequest) {
   // Protect with CRON_SECRET
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ sent: 0, message: "Aucune réservation confirmée demain." });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lacachette-nu.vercel.app";
+  const siteUrl = SITE_URL;
 
   let sent = 0;
   const errors: string[] = [];

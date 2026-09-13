@@ -5,7 +5,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Lamp, TreePalm, Music, ChevronDown } from "lucide-react";
 
-export default function HeroSection() {
+export default function HeroSection({
+  title = "Un écrin secret au cœur de Yaoundé",
+  subtitle = "Gastronomie camerounaise revisitée · Cocktails signature · Live Sessions",
+}: {
+  title?: string;
+  subtitle?: string;
+}) {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -32,7 +38,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/entree.webp"
-          alt="La Cachette Entrée"
+          alt="Entrée bambou de La Cachette, restaurant-bar Vintage Africain à Ékié, Yaoundé"
           fill
           priority
           className="object-cover object-center"
@@ -55,14 +61,14 @@ export default function HeroSection() {
             variants={itemVariants}
             className="font-[family-name:var(--font-playfair)] text-5xl md:text-7xl lg:text-8xl text-[#E8D8B8] font-bold leading-tight mb-6 drop-shadow-2xl"
           >
-            Un écrin secret <br className="hidden md:block" /> au cœur de Yaoundé
+            {title}
           </motion.h1>
           
           <motion.p 
             variants={itemVariants}
             className="font-[family-name:var(--font-jakarta)] text-lg md:text-xl text-[#C59A4A] tracking-widest uppercase mb-12"
           >
-            Gastronomie camerounaise revisitée · Cocktails signature · Live Sessions
+            {subtitle}
           </motion.p>
 
           <motion.div 
@@ -70,13 +76,13 @@ export default function HeroSection() {
             className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20"
           >
             <Link
-              href="#reservation"
+              href="/reserver"
               className="w-full sm:w-auto px-8 py-4 bg-[#C59A4A] text-[#171310] font-bold font-[family-name:var(--font-jakarta)] text-sm uppercase tracking-wider rounded-md hover:bg-[#B86B32] transition-all duration-300 shadow-[0_0_20px_rgba(197,154,74,0.4)] hover:shadow-[0_0_30px_rgba(184,107,50,0.6)]"
             >
               Réserver une Table
             </Link>
             <Link
-              href="#menu"
+              href="/carte"
               className="w-full sm:w-auto px-8 py-4 bg-transparent border-2 border-[#C59A4A] text-[#C59A4A] font-bold font-[family-name:var(--font-jakarta)] text-sm uppercase tracking-wider rounded-md hover:bg-[#C59A4A] hover:text-[#171310] transition-all duration-300"
             >
               Découvrir le Menu

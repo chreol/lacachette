@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { fromPrismaSpaceChoice, spaceLabels, statusLabels } from "@/lib/reservation-mapping";
 import Image from "next/image";
 import Link from "next/link";
+import { SITE_URL } from "@/lib/site";
 
 const STATUS_CONFIG: Record<string, { emoji: string; color: string; bg: string; border: string; message: string }> = {
   PENDING: {
@@ -57,7 +58,7 @@ export default async function ReservationStatusPage({
 
   const space = fromPrismaSpaceChoice(reservation.space);
   const sc = STATUS_CONFIG[reservation.status] ?? STATUS_CONFIG.PENDING;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lacachette-nu.vercel.app";
+  const siteUrl = SITE_URL;
   const pageUrl = `${siteUrl}/reservation/${id}`;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&format=png&color=C59A4A&bgcolor=171310&data=${encodeURIComponent(pageUrl)}`;
 

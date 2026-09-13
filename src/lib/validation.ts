@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isClosedDate } from "@/lib/opening-hours";
 
 export const spaceChoiceValues = ["terrasse", "salle", "vip", "privatisation-vip"] as const;
 
@@ -39,7 +40,13 @@ export const reservationInputSchema = z.object({
     });
   }
 
-  // Note: slot availability is checked at the API level (not in Zod)
+  if (isClosedDate(data.date)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Le restaurant est fermé ce jour-là",
+      path: ["date"],
+    });
+  }
 });
 
 export type ReservationInput = z.infer<typeof reservationInputSchema>;
@@ -69,4 +76,42 @@ export const createStaffSchema = z.object({
   password: z.string().min(8, "Mot de passe : 8 caractères minimum"),
   name: z.string().trim().min(2).max(100),
   role: z.enum(["ADMIN", "STAFF"]).default("STAFF"),
+});
+
+export const menuCategoryValues = [
+  "grillades",
+  "specialites",
+  "cocktails",
+  "boissons",
+] as const;
+
+export const menuBadgeValues = [
+  "Incontournable",
+  "Nouveau",
+  "Chef",
+  "Signature",
+] as const;
+
+export const menuDishSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  description: z.string().trim().min(8).max(500),
+  price: z.coerce.number().int().min(0).max(1_000_000),
+  category: z.enum(menuCategoryValues),
+  badge: z.union([z.enum(menuBadgeValues), z.literal(""), z.null()]).optional(),
+  spices: z.string().trim().max(200).optional(),
+  isVegetarian: z.boolean().optional(),
+  isAvailable: z.boolean().optional(),
+  sortOrder: z.coerce.number().int().min(0).max(999).optional(),
+  image: z.string().trim().max(300).optional(),
+});
+
+export const liveEventSchema = z.object({
+  title: z.string().trim().min(2).max(120),
+  date: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
+  time: z.string().trim().min(1).max(20),
+  artist: z.string().trim().min(2).max(120),
+  genre: z.string().trim().min(2).max(80),
+  description: z.string().trim().min(8).max(500),
+  image: z.string().trim().max(300).optional(),
+  isPublished: z.boolean().optional(),
 });

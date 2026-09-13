@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect, FormEvent } from 'react';
+import { useState, useRef, useEffect, FormEvent, Suspense } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
 import { User, Mail, Calendar, Clock, Users, MapPin, MessageSquare, Send, Loader2, Check, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
-import { ReservationForm } from '@/types/restaurant';
+import { liveEvents as fallbackEvents, ReservationForm, type LiveEvent } from '@/types/restaurant';
+import { isClosedDate } from '@/lib/opening-hours';
 
 interface SlotAvailability {
   time: string;
@@ -34,12 +36,26 @@ const SPACE_MAX_GUESTS: Record<string, number> = {
 const inputClassName = "w-full bg-[#171310] border border-[#4A2C20] rounded-lg px-4 py-3 pl-11 text-[#E8D8B8] focus:border-[#C59A4A] focus:ring-1 focus:ring-[#C59A4A] transition-all duration-300 placeholder:text-[#E8D8B8]/30 outline-none";
 const iconClassName = "absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#C59A4A]";
 
-function generateNext14Days(): Date[] {
-  return Array.from({ length: 14 }, (_, i) => {
+function generateDateOptions(extraDate?: string): Date[] {
+  const days = Array.from({ length: 14 }, (_, i) => {
     const d = new Date();
+    d.setHours(12, 0, 0, 0);
     d.setDate(d.getDate() + i);
     return d;
   });
+  if (extraDate && /^\d{4}-\d{2}-\d{2}$/.test(extraDate)) {
+    const exists = days.some((d) => formatDateValue(d) === extraDate);
+    if (!exists) {
+      const extra = new Date(`${extraDate}T12:00:00`);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (extra >= today) {
+        days.push(extra);
+        days.sort((a, b) => a.getTime() - b.getTime());
+      }
+    }
+  }
+  return days;
 }
 
 function formatDateValue(d: Date): string {
@@ -49,9 +65,12 @@ function formatDateValue(d: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export default function ReservationSection() {
+export default function ReservationSection({ events = fallbackEvents }: { events?: LiveEvent[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const searchParams = useSearchParams();
+  const eventParam = searchParams.get("event");
+  const selectedEvent = events.find((e) => e.id === eventParam);
 
   const [formState, setFormState] = useState<ReservationForm>({
     name: '',
@@ -70,10 +89,28 @@ export default function ReservationSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dateStatus, setDateStatus] = useState<string | null>(null);
+  const [clientWhatsApp, setClientWhatsApp] = useState<string | null>(null);
   // Clé de rafraîchissement : s'incrémente après chaque réservation pour forcer le re-fetch des créneaux
   const [slotRefreshKey, setSlotRefreshKey] = useState(0);
 
-  const dates = useRef(generateNext14Days()).current;
+  const dates = generateDateOptions(selectedEvent?.date);
+  const eventPrefillDone = useRef(false);
+
+  useEffect(() => {
+    if (!selectedEvent || eventPrefillDone.current) return;
+    eventPrefillDone.current = true;
+    const slotTime = selectedEvent.time.replace("h", ":").replace(/^(\d):/, "0$1");
+    const normalized = /^\d{2}:\d{2}$/.test(slotTime) ? slotTime : "";
+    setFormState((prev) => ({
+      ...prev,
+      date: selectedEvent.date,
+      time: normalized || prev.time,
+      message:
+        prev.message ||
+        `Pré-réservation — ${selectedEvent.title} (${selectedEvent.artist})`,
+    }));
+  }, [selectedEvent]);
 
   // Fetch availability when date, space or slotRefreshKey changes
   useEffect(() => {
@@ -93,8 +130,10 @@ export default function ReservationSection() {
         if (cancelled) return;
         if (res.ok) {
           setSlots(data.slots || []);
+          setDateStatus(data.dateStatus ?? null);
         } else {
           setSlots([]);
+          setDateStatus(null);
           setSlotsError(
             "Impossible de charger les créneaux. Réessayez dans un instant.",
           );
@@ -137,12 +176,13 @@ export default function ReservationSection() {
         body: JSON.stringify(formState),
       });
 
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
         setError(data.error ?? "Une erreur est survenue, veuillez réessayer.");
         return;
       }
 
+      setClientWhatsApp(data.clientWhatsApp ?? null);
       setIsSuccess(true);
       // Force le re-fetch des créneaux pour refléter la nouvelle réservation
       setSlotRefreshKey(prev => prev + 1);
@@ -174,6 +214,11 @@ export default function ReservationSection() {
             <h2 className="text-4xl md:text-5xl text-[#E8D8B8] font-[family-name:var(--font-playfair)] mb-8">
               Réservation
             </h2>
+            {selectedEvent && (
+              <p className="mb-6 text-sm text-[#C59A4A] border border-[#C59A4A]/30 bg-[#C59A4A]/10 rounded-lg px-4 py-3">
+                Soirée : {selectedEvent.title} · {selectedEvent.date} · {selectedEvent.time}
+              </p>
+            )}
 
             {isSuccess ? (
               <motion.div
@@ -186,11 +231,22 @@ export default function ReservationSection() {
                 </div>
                 <h3 className="text-2xl font-[family-name:var(--font-playfair)] text-[#E8D8B8] mb-2">Demande envoyée</h3>
                 <p className="text-[#E8D8B8]/80 mb-6">
-                  Votre demande de réservation a été envoyée avec succès. Notre équipe vous contactera très prochainement pour confirmation.
+                  Votre demande de réservation a été envoyée. Confirmez-la aussi sur WhatsApp — notre équipe vous répondra dessus.
                 </p>
+                {clientWhatsApp && (
+                  <a
+                    href={clientWhatsApp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 w-full mb-4 px-6 py-3 bg-[#25D366] text-[#171310] rounded-lg text-sm font-semibold"
+                  >
+                    Confirmer sur WhatsApp
+                  </a>
+                )}
                 <button
                   onClick={() => {
                     setIsSuccess(false);
+                    setClientWhatsApp(null);
                     setFormState({ name: '', phone: '', email: '', date: '', time: '', guests: 2, space: 'salle', message: '' });
                   }}
                   className="px-6 py-2 bg-[#4A2C20] text-[#E8D8B8] rounded-lg hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300 text-sm font-medium"
@@ -310,26 +366,30 @@ export default function ReservationSection() {
                     {dates.map((d, i) => {
                       const dateValue = formatDateValue(d);
                       const isSelected = formState.date === dateValue;
+                      const closed = isClosedDate(dateValue);
 
                       return (
                         <button
                           key={dateValue}
                           type="button"
-                          onClick={() => handleDateSelect(dateValue)}
+                          disabled={closed}
+                          onClick={() => !closed && handleDateSelect(dateValue)}
                           className={`flex flex-col items-center min-w-[64px] px-3 py-2.5 rounded-xl border transition-all duration-300 flex-shrink-0 ${
-                            isSelected
+                            closed
+                              ? 'bg-[#171310]/40 border-[#4A2C20]/30 text-[#E8D8B8]/30 cursor-not-allowed'
+                              : isSelected
                               ? 'bg-[#C59A4A] border-[#C59A4A] text-[#171310] shadow-lg shadow-[#C59A4A]/20'
                               : 'bg-[#171310] border-[#4A2C20] text-[#E8D8B8] hover:border-[#C59A4A]/50'
                           }`}
                         >
-                          <span className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isSelected ? 'text-[#171310]/70' : 'text-[#E8D8B8]/50'}`}>
+                          <span className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 ${isSelected && !closed ? 'text-[#171310]/70' : 'text-[#E8D8B8]/50'}`}>
                             {i === 0 ? 'Auj.' : DAYS_FR[d.getDay()]}
                           </span>
                           <span className="text-xl font-[family-name:var(--font-playfair)] font-bold leading-none">
                             {d.getDate()}
                           </span>
-                          <span className={`text-[10px] mt-0.5 ${isSelected ? 'text-[#171310]/70' : 'text-[#E8D8B8]/50'}`}>
-                            {MONTHS_FR[d.getMonth()]}
+                          <span className={`text-[10px] mt-0.5 ${isSelected && !closed ? 'text-[#171310]/70' : 'text-[#E8D8B8]/50'}`}>
+                            {closed ? 'Fermé' : MONTHS_FR[d.getMonth()]}
                           </span>
                         </button>
                       );
@@ -383,8 +443,10 @@ export default function ReservationSection() {
                               }`}
                             >
                               <span className="text-sm font-semibold">{slot.time}</span>
-                              {isLimited && !isSelected && (
-                                <span className="text-[10px] text-[#B86B32] mt-0.5">{slot.remainingCapacity} pl.</span>
+                              {!isSelected && !isFull && (
+                                <span className={`text-[10px] mt-0.5 ${isLimited ? 'text-[#B86B32]' : 'text-[#E8D8B8]/50'}`}>
+                                  {slot.remainingCapacity}/{slot.totalCapacity}
+                                </span>
                               )}
                               {isFull && (
                                 <span className="text-[10px] mt-0.5">Complet</span>
@@ -395,7 +457,9 @@ export default function ReservationSection() {
                       </div>
                     ) : (
                       <p className="text-sm text-[#E8D8B8]/50 py-4 text-center">
-                        Aucun créneau disponible pour cette date et cet espace.
+                        {dateStatus === 'closed'
+                          ? 'Fermé ce jour-là — choisissez une autre date.'
+                          : 'Aucun créneau disponible pour cette date et cet espace.'}
                       </p>
                     )}
 
@@ -403,7 +467,7 @@ export default function ReservationSection() {
                     {slots.length > 0 && (
                       <div className="flex flex-wrap gap-4 text-[10px] text-[#E8D8B8]/50 pt-1">
                         <span className="flex items-center gap-1.5">
-                          <span className="w-3 h-3 rounded border border-[#596044]/60 bg-[#171310]" /> Disponible
+                          <span className="w-3 h-3 rounded border border-[#596044]/60 bg-[#171310]" /> Disponible (places restantes)
                         </span>
                         <span className="flex items-center gap-1.5">
                           <span className="w-3 h-3 rounded border border-[#B86B32]/60 bg-[#171310]" /> Limité
@@ -504,5 +568,13 @@ export default function ReservationSection() {
         </motion.div>
       </div>
     </section>
+  );
+}
+
+export function ReservationBlock({ events }: { events?: LiveEvent[] }) {
+  return (
+    <Suspense fallback={<section id="reservation" className="py-24 bg-[#171310]" />}>
+      <ReservationSection events={events} />
+    </Suspense>
   );
 }

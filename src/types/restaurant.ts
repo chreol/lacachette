@@ -32,6 +32,7 @@ export interface MenuItem {
   badge?: "Incontournable" | "Nouveau" | "Chef" | "Signature";
   spices?: string[];
   isVegetarian?: boolean;
+  isAvailable?: boolean;
 }
 
 // ── Événements ──

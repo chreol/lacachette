@@ -8,7 +8,10 @@ import { sendEmail } from "@/lib/email";
 import { sendTelegramMessage } from "@/lib/telegram";
 import { isSlotAvailable } from "@/lib/availability";
 import { buildNewReservationStaffEmail, buildReservationConfirmationClientEmail } from "@/lib/email-templates";
-import { buildWhatsAppLink } from "@/lib/whatsapp";
+import { buildRestaurantWhatsAppLink, buildWhatsAppLink } from "@/lib/whatsapp";
+import { isClosedDate } from "@/lib/opening-hours";
+import { getSiteContent } from "@/lib/site-content";
+import { SITE_URL } from "@/lib/site";
 
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -27,6 +30,11 @@ export async function POST(request: NextRequest) {
   }
 
   const data = parsed.data;
+
+  const site = await getSiteContent();
+  if (isClosedDate(data.date, site.weekHours)) {
+    return NextResponse.json({ error: "Le restaurant est fermé ce jour-là." }, { status: 409 });
+  }
 
   // 1. Check availability
   const available = await isSlotAvailable(data.date, data.time, data.space, data.guests);
@@ -52,6 +60,9 @@ export async function POST(request: NextRequest) {
 
   const whatsappMsg = `Bonjour ${data.name}, votre réservation à La Cachette du ${data.date} à ${data.time} a bien été enregistrée. Notre équipe vous contactera très prochainement. À bientôt !`;
   const whatsappLink = buildWhatsAppLink(data.phone, whatsappMsg);
+  const clientWhatsApp = buildRestaurantWhatsAppLink(
+    `Bonjour La Cachette, je confirme ma demande de réservation : ${data.name}, ${data.date} à ${data.time}, ${data.guests} pers., ${spaceLabels[data.space] ?? data.space}.`,
+  );
 
   const notifyTo = process.env.RESERVATION_NOTIFICATION_EMAIL;
   if (notifyTo) {
@@ -65,7 +76,7 @@ export async function POST(request: NextRequest) {
       space: spaceLabels[data.space] ?? data.space,
       message: data.message,
       whatsappLink,
-      adminUrl: process.env.ADMIN_URL ?? 'https://lacachette-nu.vercel.app/admin',
+      adminUrl: process.env.ADMIN_URL ?? "https://resto.chreolempire.com/admin",
     });
 
     await sendEmail({
@@ -84,6 +95,7 @@ export async function POST(request: NextRequest) {
       space: spaceLabels[data.space] ?? data.space,
       message: data.message,
       status: statusLabels['PENDING'],
+      whatsappUrl: clientWhatsApp,
     });
 
     await sendEmail({
@@ -109,15 +121,15 @@ export async function POST(request: NextRequest) {
     data.message ? `💬 <b>Message :</b> <i>${data.message}</i>` : null,
     data.message ? `━━━━━━━━━━━━━━━━━━━━` : null,
     `📲 <a href="${whatsappLink}">Contacter sur WhatsApp</a>`,
-    `🔧 <a href="${process.env.ADMIN_URL ?? 'https://lacachette-nu.vercel.app/admin'}">Gérer dans l'Admin</a>`,
-    `🌐 <a href="https://resto.chreolempire.com">resto.chreolempire.com</a>`,
+    `🔧 <a href="${process.env.ADMIN_URL ?? "https://resto.chreolempire.com/admin"}">Gérer dans l'Admin</a>`,
+    `🌐 <a href="${SITE_URL}">${SITE_URL.replace(/^https?:\/\//, "")}</a>`,
   ].filter(Boolean).join('\n');
 
   await sendTelegramMessage(telegramMsg, 'HTML')
     .catch((err) => console.error("[reservations] notification telegram échouée", err));
 
 
-  return NextResponse.json({ id: reservation.id }, { status: 201 });
+  return NextResponse.json({ id: reservation.id, clientWhatsApp }, { status: 201 });
 }
 
 export async function GET(request: NextRequest) {

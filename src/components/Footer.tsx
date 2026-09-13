@@ -1,8 +1,17 @@
-import { Globe, Share2, Music2, MessageCircle } from 'lucide-react';
-import Link from 'next/link';
+import { Globe, Share2, Music2, MessageCircle, MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
+import { SITE_URL } from '@/lib/site';
+import { getSiteContent, mapsUrlFromContent } from '@/lib/site-content';
 
-export default function Footer() {
+const socialBtn =
+  "w-10 h-10 rounded-full bg-[#171310] border border-[#4A2C20] flex items-center justify-center text-[#C59A4A] hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300";
+
+export default async function Footer() {
+  const site = await getSiteContent();
+  const mapsUrl = mapsUrlFromContent(site);
+  const wa = `https://wa.me/${site.phone.replace(/[^\d]/g, "")}`;
+  const tel = site.phone.startsWith("+") ? site.phone : `+${site.phone.replace(/[^\d]/g, "")}`;
+
   return (
     <footer id="contact" className="bg-[#0F0D0A] text-[#E8D8B8] font-[family-name:var(--font-jakarta)] relative">
       {/* Top gradient border */}
@@ -26,23 +35,37 @@ export default function Footer() {
                   LA CACHETTE
                 </h2>
                 <p className="text-[#E8D8B8]/80 text-sm font-medium italic">
-                  L&apos;ambiance se cache ici.
+                  {site.tagline}
                 </p>
               </div>
             </div>
             <p className="text-[#E8D8B8]/70 leading-relaxed max-w-sm">
-              Une évasion intimiste au cœur de Yaoundé. L&apos;élégance du vintage africain rencontre la gastronomie moderne.
+              {site.blurb}
             </p>
             <div className="flex items-center space-x-4 pt-4">
-              <Link href="#" className="w-10 h-10 rounded-full bg-[#171310] border border-[#4A2C20] flex items-center justify-center text-[#C59A4A] hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300">
-                <Globe className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="w-10 h-10 rounded-full bg-[#171310] border border-[#4A2C20] flex items-center justify-center text-[#C59A4A] hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300">
-                <Share2 className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="w-10 h-10 rounded-full bg-[#171310] border border-[#4A2C20] flex items-center justify-center text-[#C59A4A] hover:bg-[#C59A4A] hover:text-[#171310] transition-colors duration-300">
-                <Music2 className="w-5 h-5" />
-              </Link>
+              {site.instagramUrl ? (
+                <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Instagram">
+                  <Globe className="w-5 h-5" />
+                </a>
+              ) : null}
+              {site.facebookUrl ? (
+                <a href={site.facebookUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Facebook">
+                  <Share2 className="w-5 h-5" />
+                </a>
+              ) : null}
+              {site.tiktokUrl ? (
+                <a href={site.tiktokUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="TikTok">
+                  <Music2 className="w-5 h-5" />
+                </a>
+              ) : null}
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Google Maps">
+                <MapPin className="w-5 h-5" />
+              </a>
+              {site.googleReviewUrl ? (
+                <a href={site.googleReviewUrl} target="_blank" rel="noopener noreferrer" className={socialBtn} aria-label="Avis Google">
+                  <Star className="w-5 h-5" />
+                </a>
+              ) : null}
             </div>
           </div>
 
@@ -52,22 +75,14 @@ export default function Footer() {
               Horaires
             </h3>
             <ul className="space-y-4 text-[#E8D8B8]/80">
-              <li className="flex justify-between max-w-xs">
-                <span>Mardi - Jeudi</span>
-                <span className="text-[#C59A4A]">17h - 00h</span>
-              </li>
-              <li className="flex justify-between max-w-xs">
-                <span>Vendredi - Samedi</span>
-                <span className="text-[#C59A4A]">17h - 02h</span>
-              </li>
-              <li className="flex justify-between max-w-xs">
-                <span className="flex-1">Dimanche <br/><span className="text-xs text-[#E8D8B8]/50">(Brunch &amp; Chill)</span></span>
-                <span className="text-[#C59A4A]">12h - 22h</span>
-              </li>
-              <li className="flex justify-between max-w-xs pt-2">
-                <span>Lundi</span>
-                <span className="text-[#9A4F32] font-medium">Fermé</span>
-              </li>
+              {site.hoursLabels.map((row) => (
+                <li key={row.days} className="flex justify-between max-w-xs gap-4">
+                  <span>{row.days}</span>
+                  <span className={row.hours.toLowerCase().includes("fermé") ? "text-[#9A4F32] font-medium" : "text-[#C59A4A]"}>
+                    {row.hours}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -80,7 +95,9 @@ export default function Footer() {
               {/* Adresse */}
               <div className="flex items-start gap-3">
                 <span className="text-[#C59A4A] mt-0.5 flex-shrink-0">📍</span>
-                <span className="text-sm">Sis à Ékié, Dernier Poteau – Yaoundé, Cameroun</span>
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:text-[#C59A4A] transition-colors">
+                  Sis à {site.addressStreet} – Yaoundé, Cameroun
+                </a>
               </div>
 
               {/* Paiement */}
@@ -92,8 +109,8 @@ export default function Footer() {
               {/* Téléphone */}
               <div className="flex items-center gap-3">
                 <span className="text-[#C59A4A] flex-shrink-0">📞</span>
-                <a href="tel:+237693547268" className="hover:text-[#C59A4A] transition-colors text-sm">
-                  (237) 693 547 268
+                <a href={`tel:${tel}`} className="hover:text-[#C59A4A] transition-colors text-sm">
+                  {tel.replace("+237", "(237)")}
                 </a>
               </div>
 
@@ -107,12 +124,12 @@ export default function Footer() {
                   className="flex-shrink-0"
                 />
                 <a
-                  href="https://wa.me/237693547268"
+                  href={wa}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#E8D8B8] hover:text-[#25D366] transition-colors text-sm"
                 >
-                  +237 693 547 268 (WhatsApp)
+                  {tel} (WhatsApp)
                 </a>
               </div>
 
@@ -133,12 +150,12 @@ export default function Footer() {
               <div className="flex items-center gap-3">
                 <span className="text-[#C59A4A] flex-shrink-0">🌐</span>
                 <a
-                  href="https://resto.chreolempire.com"
+                  href={SITE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#E8D8B8] hover:text-[#C59A4A] transition-colors text-sm"
                 >
-                  resto.chreolempire.com
+                  {SITE_URL.replace(/^https?:\/\//, "")}
                 </a>
               </div>
 
@@ -146,11 +163,11 @@ export default function Footer() {
               <div className="flex items-start gap-3 pt-1">
                 <span className="text-[#C59A4A] flex-shrink-0 mt-0.5">📧</span>
                 <div className="flex flex-col gap-1">
-                  <a href="mailto:restolacachatte@chreolempire.com" className="text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors">
-                    restolacachatte@chreolempire.com
+                  <a href={`mailto:${site.email}`} className="text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors">
+                    {site.email}
                   </a>
-                  <a href="mailto:lacachette@resto.chreolempire.com" className="text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors">
-                    lacachette@resto.chreolempire.com
+                  <a href={`mailto:${site.emailAlt}`} className="text-xs text-[#E8D8B8]/70 hover:text-[#C59A4A] transition-colors">
+                    {site.emailAlt}
                   </a>
                 </div>
               </div>

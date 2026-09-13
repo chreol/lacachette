@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_OG_IMAGE,
+  SITE_TAGLINE,
+  SITE_URL,
+} from "@/lib/site";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -18,26 +25,68 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "LA CACHETTE — Restaurant-Bar Vintage Africain · Ékié, Yaoundé",
-  description:
-    "LA CACHETTE : restaurant-bar éco-lounge au concept Vintage Africain haut de gamme à Ékié, Yaoundé. Cuisine camerounaise revisitée, cocktails signature, live sessions acoustiques dans un écrin de bois, bambou et lumière ambrée.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s · ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
   keywords: [
     "La Cachette",
+    "La Cachette Yaoundé",
     "restaurant Yaoundé",
+    "restaurant Ékié",
     "bar lounge Cameroun",
-    "vintage africain",
-    "Ékié",
-    "cuisine camerounaise",
-    "cocktails",
+    "cuisine camerounaise Yaoundé",
+    "ndolé Yaoundé",
+    "poisson braisé Ékié",
+    "cocktails Yaoundé",
     "live music Yaoundé",
+    "réservation restaurant Yaoundé",
+    "vintage africain",
   ],
+  authors: [{ name: "La Cachette", url: SITE_URL }],
+  creator: "Chreol Empire",
+  alternates: { canonical: SITE_URL },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "LA CACHETTE — Vintage Africain · Ékié, Yaoundé",
-    description:
-      "Un écrin secret au cœur de Yaoundé. Gastronomie camerounaise, cocktails signature et soirées live dans une ambiance bois, bambou et lumière ambrée.",
+    title: `${SITE_NAME} — Vintage Africain · Ékié, Yaoundé`,
+    description: SITE_DESCRIPTION,
     type: "website",
     locale: "fr_CM",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    images: [
+      {
+        url: SITE_OG_IMAGE,
+        width: 1200,
+        height: 630,
+        alt: "Entrée de La Cachette, restaurant-bar à Ékié, Yaoundé",
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE_NAME} — Ékié, Yaoundé`,
+    description: SITE_DESCRIPTION,
+    images: [SITE_OG_IMAGE],
+  },
+  icons: {
+    icon: "/images/logo.webp",
+    apple: "/images/logo.webp",
+  },
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
