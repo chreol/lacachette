@@ -75,7 +75,9 @@ function mergeContent(raw: unknown): SiteContent {
   const placeholderGeo =
     !incoming.geoLat ||
     incoming.geoLat === "3.848" ||
-    incoming.geoLat === String(3.848);
+    incoming.geoLat === String(3.848) ||
+    incoming.geoLat === "3.831866" ||
+    incoming.geoLat === String(3.831866);
   return {
     ...DEFAULT_SITE_CONTENT,
     ...incoming,

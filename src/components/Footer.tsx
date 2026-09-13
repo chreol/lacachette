@@ -2,6 +2,8 @@ import { Globe, Share2, Music2, MessageCircle, MapPin, Star } from 'lucide-react
 import Image from 'next/image';
 import FlagCounter from '@/components/FlagCounter';
 import { SITE_URL } from '@/lib/site';
+import { buildRestaurantWhatsAppLink } from '@/lib/whatsapp';
+import { DELIVERY_WHATSAPP_MESSAGE } from '@/lib/restaurant-location';
 import { getSiteContent, mapsUrlFromContent } from '@/lib/site-content';
 
 const socialBtn =
@@ -11,6 +13,7 @@ export default async function Footer() {
   const site = await getSiteContent();
   const mapsUrl = mapsUrlFromContent(site);
   const wa = `https://wa.me/${site.phone.replace(/[^\d]/g, "")}`;
+  const waDelivery = buildRestaurantWhatsAppLink(DELIVERY_WHATSAPP_MESSAGE);
   const tel = site.phone.startsWith("+") ? site.phone : `+${site.phone.replace(/[^\d]/g, "")}`;
 
   return (
@@ -97,11 +100,28 @@ export default async function Footer() {
               <div className="flex items-start gap-3">
                 <span className="text-[#C59A4A] mt-0.5 flex-shrink-0">📍</span>
                 <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="text-sm hover:text-[#C59A4A] transition-colors">
-                  Sis à {site.addressStreet} – Yaoundé, Cameroun
+                  Sis à {site.addressStreet} – Yaoundé IV, Cameroun
                 </a>
               </div>
 
-              {/* Paiement */}
+              {/* Livraison */}
+              <div className="flex items-start gap-3">
+                <span className="text-[#C59A4A] mt-0.5 flex-shrink-0">🛵</span>
+                <div className="text-sm">
+                  <a href="/#livraison" className="hover:text-[#C59A4A] transition-colors">
+                    Livraison Ékié &amp; alentours
+                  </a>
+                  <span className="text-[#E8D8B8]/40"> — </span>
+                  <a
+                    href={waDelivery}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#25D366] hover:underline"
+                  >
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
               <div className="flex items-start gap-3">
                 <span className="text-[#C59A4A] mt-0.5 flex-shrink-0">🔐</span>
                 <span className="text-xs text-[#E8D8B8]/60">Mobile Money · Virement · PayPal · Crypto</span>

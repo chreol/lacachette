@@ -1,3 +1,5 @@
+import { RESTAURANT_LOCATION } from "@/lib/restaurant-location";
+
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://resto.chreolempire.com"
 ).replace(/\/$/, "");
@@ -16,8 +18,8 @@ export const SITE_ADDRESS = {
   country: "CM",
 };
 export const SITE_GEO = {
-  latitude: 3.831866,
-  longitude: 11.540261,
+  latitude: RESTAURANT_LOCATION.lat,
+  longitude: RESTAURANT_LOCATION.lng,
 };
 export const SITE_MAPS_URL = "https://maps.app.goo.gl/qJYFWab2BePrqKGZ8";
 export const SITE_OG_IMAGE = `${SITE_URL}/images/entree.webp`;

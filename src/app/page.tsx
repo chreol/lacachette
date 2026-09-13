@@ -6,6 +6,7 @@ import SpacesSection from "@/components/SpacesSection";
 import MenuSection from "@/components/MenuSection";
 import EventsSection from "@/components/EventsSection";
 import { ReservationBlock } from "@/components/ReservationSection";
+import DeliverySection from "@/components/DeliverySection";
 import Footer from "@/components/Footer";
 import { RestaurantJsonLd } from "@/components/RestaurantJsonLd";
 import { getPublicEvents, getPublicMenu } from "@/lib/content";
@@ -39,6 +40,7 @@ export default async function Home() {
         <StorySection />
         <SpacesSection />
         <MenuSection items={menuItems} />
+        <DeliverySection />
         <EventsSection events={events} />
         <ReservationBlock events={events} />
       </main>

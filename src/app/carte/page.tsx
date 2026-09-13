@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import MenuSection from "@/components/MenuSection";
+import DeliverySection from "@/components/DeliverySection";
 import Footer from "@/components/Footer";
 import { RestaurantJsonLd } from "@/components/RestaurantJsonLd";
 import { getPublicEvents, getPublicMenu } from "@/lib/content";
@@ -28,6 +29,7 @@ export default async function CartePage() {
       <Navbar />
       <main className="pt-24">
         <MenuSection items={menuItems} />
+        <DeliverySection />
       </main>
       <Footer />
     </>
