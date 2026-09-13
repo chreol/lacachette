@@ -1,5 +1,6 @@
 import { Globe, Share2, Music2, MessageCircle, MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
+import FlagCounter from '@/components/FlagCounter';
 import { SITE_URL } from '@/lib/site';
 import { getSiteContent, mapsUrlFromContent } from '@/lib/site-content';
 
@@ -200,10 +201,11 @@ export default async function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-[#4A2C20]/50 bg-[#0A0807]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[#E8D8B8]/60 text-sm">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <p className="text-[#E8D8B8]/60 text-sm text-center md:text-left">
             © 2026 La Cachette. Tous droits réservés. <span className="hidden md:inline">|</span> Fait avec ♥ à Yaoundé
           </p>
+          <FlagCounter />
           <p className="text-[#E8D8B8]/30 text-xs">
             Powered by <a href="https://chreolempire.com" target="_blank" rel="noopener noreferrer" className="text-[#C59A4A]/50 hover:text-[#C59A4A] transition-colors">Chreol Empire</a>
           </p>

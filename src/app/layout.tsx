@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ScrollJumpButtons from "@/components/ScrollJumpButtons";
+import TawkChat from "@/components/TawkChat";
 import {
   SITE_DESCRIPTION,
   SITE_NAME,
@@ -97,7 +99,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-black-ebony text-ivory-cream">
         {children}
+        <ScrollJumpButtons />
         <WhatsAppButton />
+        <TawkChat />
       </body>
     </html>
   );
